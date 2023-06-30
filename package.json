@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "colyseus.js": "^0.15.9",
+    "leaflet": "^1.9.4"
+  }
+}
