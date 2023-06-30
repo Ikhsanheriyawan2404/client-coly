@@ -1,18 +1,14 @@
-import { Client } from "colyseus.js";
+class ColyClient {
 
-export default class ColyClient {
-
-	public serverUrl: string;
-	public client: any;
-	public room: any;
+	serverUrl;
+	client;
+	room;
 
 	constructor() {
-		console.log("ColyClient");
-
-		this.serverUrl = "ws://localhost:2567";
+		this.serverUrl = "ws://localhost:4000";
 
 		// Inisialisasi klien Colyseus
-		this.client = new Client(this.serverUrl);
+		this.client = new Colyseus.Client(this.serverUrl);
 
 		// Menyimpan referensi ke ruangan Colyseus yang saat ini diikuti
 		this.room = null;
@@ -29,7 +25,7 @@ export default class ColyClient {
 		}
 	}
 
-	async joinOrCreateRoom(roomName: string, options: any) {
+	async joinOrCreateRoom(roomName, options) {
     try {
       this.room = await this.client.joinOrCreate(roomName, options);
       console.log("Joined room:", this.room.name);
@@ -38,7 +34,7 @@ export default class ColyClient {
     }
   }
 
-	public addListeners() {
+	addListeners() {
     if (this.room) {
       this.room.onMessage("message", (message) => {
         console.log("Received message from server:", message);
@@ -59,7 +55,7 @@ export default class ColyClient {
     }
   }
 
-	sendMessage(message: string)  {
+	sendMessage(message)  {
     if (this.room) {
       this.room.send("message", message);
     } else {
@@ -76,10 +72,22 @@ export default class ColyClient {
   }
 }
 
-// Contoh penggunaan:
-const colyseusClient = new ColyClient();
-colyseusClient.connect().then(() => {
-  colyseusClient.joinOrCreateRoom("treasure-hunter", {
-		playerName: "John Doe",
-	});
+
+const colyClient = new ColyClient();
+const options = {
+  "id": 1,
+  "name": "IKhsan HEriyawan",
+  "email": "ikhsan@gmail.com",
+  "health": 100,
+  "armor": 0,
+  "speed": 100,
+  "position": {
+    "lat": 1292092.192,
+    "long": 13334324.182
+  }    
+};
+colyClient.client.joinOrCreate("my_room", options).then(room => {
+  console.log(room.sessionId, "joined", room.name);
+}).catch(e => {
+  console.log("JOIN ERROR", e);
 });
