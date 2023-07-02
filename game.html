@@ -84,50 +84,14 @@
     <script src="node_modules/colyseus.js/dist/colyseus.js"></script>
     <script src="node_modules/jquery/dist/jquery.min.js"></script>
     <script src="node_modules/toastr/toastr.js"></script>
+    <script src="dist/Helper.js"></script>
+    <script src="dist/PlayerDetail.js"></script>
+    <script src="dist/Player.js"></script>
     <script src="dist/multiplayers.js"></script>
     <script src="dist/dataPolyJakarta.js"></script>
     <script src="dist/jawaBarat.js"></script>
 
     <script>
-
-                const url = new URL(window.location.href);
-
-const params = new URLSearchParams(url.search);
-
-const nameValue = params.get('name');
-
-function generateRandomId() {
-  const timestamp = Date.now().toString(36); // Convert timestamp to base36 string
-  const randomString = Math.random().toString(36).substr(2, 5); // Random alphanumeric string
-  const randomId = `${timestamp}-${randomString}`;
-  return randomId;
-}
-
-// Example usage:
-const randomId = generateRandomId();
-
-        const options = {
-            // "id": localStorage.getItem('userId') ? localStorage.getItem('userId') : randomId,
-            // "name": localStorage.getItem('userName') ? localStorage.getItem('userName') : nameValue,
-            "id": randomId,
-            "name": nameValue,
-            "health": 100,
-            "armor": 0,
-            "speed": 100,
-            "position": {
-                "lat": 1292092.192,
-                "long": 13334324.182
-            }    
-        };
-
-        colyClient.connect("my_room", options).then(room => {
-            colyClient.addListeners();
-            
-            toastr.success("selamat ada join baru bernama " + nameValue);
-        }).catch(e => {
-            console.log("JOIN ERROR", e);
-        });
-
 
         const optionMaps = {
             dragging: false, // Disable panning and scrolling
@@ -172,7 +136,7 @@ const randomId = generateRandomId();
                     break;
             }
             colyClient.room.send('move', {
-                player_id: randomId,
+                player_id: colyClient.options.id,
                 position: {
                     lat: map.getCenter().lat,
                     long: map.getCenter().lng
@@ -230,11 +194,11 @@ const randomId = generateRandomId();
         // Leaflet Map initialization
 
         function getCurrentTime() {
-  const now = new Date();
-  const hours = String(now.getHours()).padStart(2, '0');
-  const minutes = String(now.getMinutes()).padStart(2, '0');
-  const seconds = String(now.getSeconds()).padStart(2, '0');
-  const currentTime = `${hours}:${minutes}:${seconds}`;
+    const now = new Date();
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    const currentTime = `${hours}:${minutes}:${seconds}`;
   return currentTime;
 }
 
@@ -244,16 +208,12 @@ const randomId = generateRandomId();
 function sendMessage() {
     const message = document.getElementById('chat-input').value;
     let data =  {
-        message_id: generateRandomId(),
+        message_id: HelperObj.generateRandomId(),
         type: 'public-message',
-        player_id: randomId,
-        player_name: nameValue,
+        player_id: colyClient.options.id,
+        player_name: colyClient.options.name,
         message: message,
         time: getCurrentTime()
-    }
-
-    if (message.trim() !== '') {
-        displayMessage(data);
     }
 
     document.getElementById('chat-input').value = '';

@@ -3,6 +3,7 @@ class ColyClient {
 	serverUrl;
 	client;
 	room;
+  options;
 
 	constructor() {
 		this.serverUrl = "ws://localhost:2567";
@@ -10,10 +11,31 @@ class ColyClient {
 		this.client = new Colyseus.Client(this.serverUrl);
 
 		this.room = null;
-    this.controlClient = false;
 
-		// this.addListeners();
+    this.options = {
+      "id": HelperObj.generateRandomId(),
+      "name": HelperObj.getUserName(),
+      "health": 100,
+      "armor": 0,
+      "speed": 100,
+      "position": {
+        "lat": 1292092.192,
+        "long": 13334324.182
+      }    
+    };
+
+    this.connectToServer();
 	}
+
+  connectToServer() {
+    this.client.joinOrCreate("my_room", this.options).then(room => {
+      this.room = room;
+      Player.addPlayer(this.options);
+      this.addListeners();
+    }).catch(e => {
+      console.log("JOIN ERROR", e);
+    });
+  }
 
 	async connect(roomName, options) {
     try {
@@ -44,26 +66,51 @@ class ColyClient {
 
       });
 
-      colyClient.room.state.listen("send_message",(message, key) => {
-        console.log('kontol')
-      })
+      this.room.onMessage("send_message", (message) => {
+        if (message.message.trim() !== '') {
+          toastr.info(`ada pesan masuk`);
+          displayMessage(message);
+        }
+      });
 
-      colyClient.room.state.Message.onAdd = (message, key) => {
-        console.log('message', message, key);
-        mission.onChange = (changes) => {
+      this.room.onMessage("move", (data) => {
+        console.log(data)
+      });
+
+      this.room.onMessage("onJoin", (message) => {
+        toastr.success(`${message.message} ${message.id}`);
+      });
+
+      this.room.onMessage("onLeave", (message) => {
+        toastr.error(`${message} meninggalkan permainan!`);
+      });
+
+      this.room.onStateChange((state) => {
+        state.Message.onAdd = (message, key) => {
+          console.log('message', message, key);
+          mission.onChange = (changes) => {
+            console.log('changes', changes)
+          };
+        }
+
+        state.Message.onChange = (changes) => {
           console.log('changes', changes)
         };
-      }
-
-      colyClient.room.state.Player.onAdd = (players, key) => {
-        console.log(';onadd')
-        colyClient.room.state.Player.onChange = (changes) => {
-          console.log('changes', changes)
+  
+        state.Player.onAdd = (players, key) => {
+          console.log(';onadd')
+          colyClient.room.state.Player.onChange = (changes) => {
+            console.log('changes', changes)
+          };
         };
-      };
+      });
+      // this.room.state.listen("position", (value, key) => {
+      //   console.log('value', value, key)
+      // });
 
       this.room.state.Player.onRemove = (players, key) => {
-        // toastr.info(`${players.name} keluar Room`);
+        toastr.info(`${players.name} keluar Room`);
+        console.log(`${players.name} keluar Room`);
       }
 
       this.room.onError((code, message) => {
@@ -71,7 +118,6 @@ class ColyClient {
       });
 
       this.room.onLeave(() => {
-        console.log("Left the room.");
         this.room = null;
       });
     } else {
@@ -89,4 +135,3 @@ class ColyClient {
 }
 
 const colyClient = new ColyClient();
-
