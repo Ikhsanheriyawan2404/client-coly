@@ -62,6 +62,8 @@
 </head>
 <body>
     <div id="map"></div>
+
+    <!-- Chat Modal -->
     <div id="chat">
         <div id="chat-messages"></div>
         <input type="text" id="chat-input" placeholder="Ketik pesan anda disini..." />
@@ -69,12 +71,12 @@
 
     <!-- Analog Buttons -->
     <div class="analog-buttons">
-        <button onclick="moveMap('up')">Up</button>
+        <button onclick="Leaflet.map('up')">Up</button>
         <br>
-        <button onclick="moveMap('left')">Left</button>
-        <button onclick="moveMap('right')">Right</button>
+        <button onclick="Leaflet.map('left')">Left</button>
+        <button onclick="Leaflet.map('right')">Right</button>
         <br>
-        <button onclick="moveMap('down')">Down</button>
+        <button onclick="Leaflet.map('down')">Down</button>
     </div>    
     <audio controls" type="audio/mpeg">
         Your browser does not support the audio element.
@@ -88,147 +90,121 @@
     <script src="dist/PlayerDetail.js"></script>
     <script src="dist/Player.js"></script>
     <script src="dist/multiplayers.js"></script>
+    <script src="dist/MapLeaflet.js"></script>
     <script src="dist/dataPolyJakarta.js"></script>
     <script src="dist/jawaBarat.js"></script>
 
     <script>
 
-        const optionMaps = {
-            dragging: false, // Disable panning and scrolling
-            zoomControl: false, // Disable zooming
-            scrollWheelZoom: false, // Menonaktifkan zoom dengan scroll
-            doubleClickZoom: false, // Menonaktifkan zoom dengan double click
-            touchZoom: false, // Menonaktifkan zoom dengan gesture pada perangkat mobile
+    function moveMap(direction) {
+        var step = 0.005; // Adjust the step size as needed
+        var currentCenter = Leaflet.map.getCenter();
+
+        switch (direction) {
+            case 'up':
+                Leaflet.map.panTo([currentCenter.lat + (step / Leaflet.map.getZoom()), currentCenter.lng]);
+                break;
+            case 'down':
+                Leaflet.map.panTo([currentCenter.lat - (step / Leaflet.map.getZoom()), currentCenter.lng]);
+                break;
+            case 'left':
+                Leaflet.map.panTo([currentCenter.lat, currentCenter.lng - (step / Leaflet.map.getZoom())]);
+                break;
+            case 'right':
+                Leaflet.map.panTo([currentCenter.lat, currentCenter.lng + (step / Leaflet.map.getZoom())]);
+                break;
+            default:
+                break;
         }
-        const center = [-6.200000, 106.816666];
-        var map = L.map('map', optionMaps).setView(center, 17);
-        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-        }).addTo(map);
-
-        // add icon to marker
-        var myIcon = L.icon({
-            iconUrl: 'assets/img/icon.png',
-            iconSize: [32, 32],
-            iconAnchor: [16, 16],
-        });
-        let marker = L.marker(center, {icon: myIcon}).addTo(map)
-
-        function moveMap(direction) {
-            var step = 0.005; // Adjust the step size as needed
-            var currentCenter = map.getCenter();
-
-            switch (direction) {
-                case 'up':
-                    map.panTo([currentCenter.lat + (step / map.getZoom()), currentCenter.lng]);
-                    break;
-                case 'down':
-                    map.panTo([currentCenter.lat - (step / map.getZoom()), currentCenter.lng]);
-                    break;
-                case 'left':
-                    map.panTo([currentCenter.lat, currentCenter.lng - (step / map.getZoom())]);
-                    break;
-                case 'right':
-                    map.panTo([currentCenter.lat, currentCenter.lng + (step / map.getZoom())]);
-                    break;
-                default:
-                    break;
+        colyClient.room.send('move', {
+            player_id: colyClient.options.id,
+            position: {
+                lat: Leaflet.map.getCenter().lat,
+                long: Leaflet.map.getCenter().lng
             }
-            colyClient.room.send('move', {
-                player_id: colyClient.options.id,
-                position: {
-                    lat: map.getCenter().lat,
-                    long: map.getCenter().lng
-                }
-            });
-            marker.setLatLng(map.getCenter());
-        }
-
-        document.addEventListener("keydown", function(event) {
-    var key = event.key.toLowerCase();
-    switch (key) {
-      case "w": // Tombol "w" untuk bergerak ke atas (up)
-        moveMap("up");
-        break;
-      case "s": // Tombol "s" untuk bergerak ke bawah (down)
-        moveMap("down");
-        break;
-      case "a": // Tombol "a" untuk bergerak ke kiri (left)
-        moveMap("left");
-        break;
-      case "d": // Tombol "d" untuk bergerak ke kanan (right)
-        moveMap("right");
-        break;
-      default:
-        break;
-    }
-  });
-        function polyToGeoJSON(polyData) {
-            const lines = polyData.trim().split('\n');
-            const name = lines[0].trim();
-            const coordinates = lines.slice(2, lines.length - 2).map(line => {
-                const [lng, lat] = line.trim().split(/\s+/).map(Number);
-                return [lng, lat];
-            });
-
-            const geojson = {
-                type: 'Feature',
-                properties: {
-                    name: name
-                },
-                geometry: {
-                    type: 'Polygon',
-                    coordinates: [coordinates]
-                }
-            };
-            return geojson;
-        }
-
-        const geojsonPolygon = polyToGeoJSON(polyJakarta);
-        const gwoJawaBarat = polyToGeoJSON(jawaBarat);
-
-        // L.geoJSON(geojsonPolygon).addTo(map);
-        // L.geoJSON(gwoJawaBarat).addTo(map);
-
-        // Leaflet Map initialization
-
-        function getCurrentTime() {
-    const now = new Date();
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    const seconds = String(now.getSeconds()).padStart(2, '0');
-    const currentTime = `${hours}:${minutes}:${seconds}`;
-  return currentTime;
-}
-
-
-
-
-function sendMessage() {
-    const message = document.getElementById('chat-input').value;
-    let data =  {
-        message_id: HelperObj.generateRandomId(),
-        type: 'public-message',
-        player_id: colyClient.options.id,
-        player_name: colyClient.options.name,
-        message: message,
-        time: getCurrentTime()
+        });
+        Leaflet.marker.setLatLng(Leaflet.map.getCenter());
     }
 
-    document.getElementById('chat-input').value = '';
-    colyClient.room.send('send_message', data);
-}
+    document.addEventListener("keydown", function(event) {
+        var key = event.key.toLowerCase();
+        switch (key) {
+        case "w": // Tombol "w" untuk bergerak ke atas (up)
+            moveMap("up");
+            break;
+        case "s": // Tombol "s" untuk bergerak ke bawah (down)
+            moveMap("down");
+            break;
+        case "a": // Tombol "a" untuk bergerak ke kiri (left)
+            moveMap("left");
+            break;
+        case "d": // Tombol "d" untuk bergerak ke kanan (right)
+            moveMap("right");
+            break;
+        default:
+            break;
+        }
+    });
+
+    function polyToGeoJSON(polyData) {
+        const lines = polyData.trim().split('\n');
+        const name = lines[0].trim();
+        const coordinates = lines.slice(2, lines.length - 2).map(line => {
+            const [lng, lat] = line.trim().split(/\s+/).map(Number);
+            return [lng, lat];
+        });
+
+        const geojson = {
+            type: 'Feature',
+            properties: {
+                name: name
+            },
+            geometry: {
+                type: 'Polygon',
+                coordinates: [coordinates]
+            }
+        };
+        return geojson;
+    }
+
+    const geojsonPolygon = polyToGeoJSON(polyJakarta);
+    const gwoJawaBarat = polyToGeoJSON(jawaBarat);
+
+    // L.geoJSON(geojsonPolygon).addTo(Leaflet.map);
+    // L.geoJSON(gwoJawaBarat).addTo(Leaflet.map);
+
+    function getCurrentTime() {
+        const now = new Date();
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+        const currentTime = `${hours}:${minutes}:${seconds}`;
+        return currentTime;
+    }
+
+    function sendMessage() {
+        const message = document.getElementById('chat-input').value;
+        let data =  {
+            message_id: HelperObj.generateRandomId(),
+            type: 'public-message',
+            player_id: colyClient.options.id,
+            player_name: colyClient.options.name,
+            message: message,
+            time: getCurrentTime()
+        }
+
+        document.getElementById('chat-input').value = '';
+        colyClient.room.send('send_message', data);
+    }
 
 
-// Function to display received and sent messages in the chat box
-function displayMessage(data) {
-    const chatMessages = document.getElementById('chat-messages');
-    const newMessage = document.createElement('div');
-    newMessage.innerHTML = `${data.time}-<strong>${data.player_name}:</strong> ${data.message}`;
-    chatMessages.appendChild(newMessage);
-    chatMessages.scrollTop = chatMessages.scrollHeight; // Scroll to the bottom of the chat box
-}
+    function displayMessage(data) {
+        const chatMessages = document.getElementById('chat-messages');
+        const newMessage = document.createElement('div');
+        newMessage.innerHTML = `${data.time}-<strong>${data.player_name}:</strong> ${data.message}`;
+        chatMessages.appendChild(newMessage);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
 
     </script>
 </body>

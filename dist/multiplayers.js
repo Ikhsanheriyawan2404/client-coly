@@ -7,7 +7,7 @@ class ColyClient {
 
 	constructor() {
 		this.serverUrl = "ws://localhost:2567";
-
+    this.userId = null;
 		this.client = new Colyseus.Client(this.serverUrl);
 
 		this.room = null;
@@ -15,22 +15,23 @@ class ColyClient {
     this.options = {
       "id": HelperObj.generateRandomId(),
       "name": HelperObj.getUserName(),
-      "health": 100,
-      "armor": 0,
-      "speed": 100,
-      "position": {
-        "lat": 1292092.192,
-        "long": 13334324.182
-      }    
+      // "health": 100,
+      // "armor": 0,
+      // "speed": 100,
+      // "position": {
+      //   "lat": 1292092.192,
+      //   "long": 13334324.182
+      // }
     };
+
+    this.user = null;
 
     this.connectToServer();
 	}
 
   connectToServer() {
     this.client.joinOrCreate("my_room", this.options).then(room => {
-      this.room = room;
-      Player.addPlayer(this.options);
+      colyClient.room = room;
       this.addListeners();
     }).catch(e => {
       console.log("JOIN ERROR", e);
@@ -46,25 +47,41 @@ class ColyClient {
     }
   }
 
-  _StateMessage(message, key) {
-    message.onChange = (changes) => {
-      console.log('changes', changes)
-    };
-    console.log('message', message, key)
+  _StatePlayer(player, key) {
+    //
   }
 
 	addListeners() {
     if (this.room) {
       this.room.onStateChange.once((state) => {
-
         state.Message.$items.forEach((messages, key) => {
           displayMessage(messages);
         });
+      })
+      this.room.onStateChange((state) => {
 
-        state.ObjectMap.$items.forEach((objectMaps, key) => {
+        this.room.state.Player.onAdd = (player, sessionId) => {
+          console.log('New player added:', player); // Data player yang baru ditambahkan
+          // Lakukan apa pun yang diperlukan untuk meng-assign data player ke objek di frontend
+          // Misalnya, jika Anda memiliki array players di frontend:
+        };
+
+        state.Player.$items.forEach((player, key) => {
+          // if (player.id !== this.userId) {
+          //   this.user = player;
+          //   Leaflet.map.setView([player.position.lat, player.position.long], Leaflet.zoom);
+          //   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          //     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+          //   }).addTo(Leaflet.map);
+          //   Leaflet.marker.setLatLng([player.position.lat, player.position.long]).addTo(Leaflet.map);
+          // }
         });
 
       });
+
+      this.room.state.Player.onAdd = (players, key) => {
+        console.log('onadd')
+      }
 
       this.room.onMessage("send_message", (message) => {
         if (message.message.trim() !== '') {
@@ -74,7 +91,8 @@ class ColyClient {
       });
 
       this.room.onMessage("move", (data) => {
-        console.log(data)
+        // set marker position
+
       });
 
       this.room.onMessage("onJoin", (message) => {
@@ -118,16 +136,16 @@ class ColyClient {
       });
 
       this.room.onLeave(() => {
-        this.room = null;
+        colyClient.room = null;
       });
     } else {
-      console.log('wakwau')
+      console.log('Not connected any room')
     }
   }
 
 	leaveRoom() {
-    if (this.room) {
-      this.room.leave();
+    if (colyClient.room) {
+      colyClient.room.leave();
     } else {
       console.warn("Not in a room.");
     }
