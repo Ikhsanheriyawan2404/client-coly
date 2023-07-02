@@ -5,27 +5,17 @@ class ColyClient {
 	room;
 
 	constructor() {
-		this.serverUrl = "ws://localhost:4000";
+		this.serverUrl = "ws://localhost:2567";
 
-		// Inisialisasi klien Colyseus
 		this.client = new Colyseus.Client(this.serverUrl);
 
-		// Menyimpan referensi ke ruangan Colyseus yang saat ini diikuti
 		this.room = null;
+    this.controlClient = false;
 
-		this.addListeners();
+		// this.addListeners();
 	}
 
-	async connect() {
-		try {
-			await this.client.connect();
-			console.log("Connected to Colyseus server!");
-		} catch (error) {
-			console.error("Error connecting to Colyseus server:", error);
-		}
-	}
-
-	async joinOrCreateRoom(roomName, options) {
+	async connect(roomName, options) {
     try {
       this.room = await this.client.joinOrCreate(roomName, options);
       console.log("Joined room:", this.room.name);
@@ -34,15 +24,47 @@ class ColyClient {
     }
   }
 
+  _StateMessage(message, key) {
+    message.onChange = (changes) => {
+      console.log('changes', changes)
+    };
+    console.log('message', message, key)
+  }
+
 	addListeners() {
     if (this.room) {
-      this.room.onMessage("message", (message) => {
-        console.log("Received message from server:", message);
+      this.room.onStateChange.once((state) => {
+
+        state.Message.$items.forEach((messages, key) => {
+          displayMessage(messages);
+        });
+
+        state.ObjectMap.$items.forEach((objectMaps, key) => {
+        });
+
       });
 
-      this.room.onStateChange((state) => {
-        console.log("Room state updated:", state);
-      });
+      colyClient.room.state.listen("send_message",(message, key) => {
+        console.log('kontol')
+      })
+
+      colyClient.room.state.Message.onAdd = (message, key) => {
+        console.log('message', message, key);
+        mission.onChange = (changes) => {
+          console.log('changes', changes)
+        };
+      }
+
+      colyClient.room.state.Player.onAdd = (players, key) => {
+        console.log(';onadd')
+        colyClient.room.state.Player.onChange = (changes) => {
+          console.log('changes', changes)
+        };
+      };
+
+      this.room.state.Player.onRemove = (players, key) => {
+        // toastr.info(`${players.name} keluar Room`);
+      }
 
       this.room.onError((code, message) => {
         console.error("Error from server:", code, message);
@@ -52,14 +74,8 @@ class ColyClient {
         console.log("Left the room.");
         this.room = null;
       });
-    }
-  }
-
-	sendMessage(message)  {
-    if (this.room) {
-      this.room.send("message", message);
     } else {
-      console.warn("Not in a room. Unable to send message.");
+      console.log('wakwau')
     }
   }
 
@@ -72,22 +88,5 @@ class ColyClient {
   }
 }
 
-
 const colyClient = new ColyClient();
-const options = {
-  "id": 1,
-  "name": "IKhsan HEriyawan",
-  "email": "ikhsan@gmail.com",
-  "health": 100,
-  "armor": 0,
-  "speed": 100,
-  "position": {
-    "lat": 1292092.192,
-    "long": 13334324.182
-  }    
-};
-colyClient.client.joinOrCreate("my_room", options).then(room => {
-  console.log(room.sessionId, "joined", room.name);
-}).catch(e => {
-  console.log("JOIN ERROR", e);
-});
+

@@ -2,75 +2,17 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ColySeus</title>   
-
-    <link href="node_modules/leaflet/dist/leaflet.css" rel="stylesheet">
-    <style>
-        #map{
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            width: 100%;
-        }
-
-        .analog-buttons {
-      position: absolute;
-      bottom: 20px;
-      right: 20px;
-      z-index: 1000;
-    }
-    </style>
+    <title>Treasure Game Hunter</title>
 </head>
 <body>
-    <div id="map"></div>
+    <!-- Form input enter your name -->
+    <form action="game.html" method="GET">
+        <label for="name">Masukan nama anda!</label>
+        <input type="text" id="name" name="name" required><br><br>
+        <input type="submit" value="Mainkan Game">
+    </form>
 
-      <!-- Analog Buttons -->
-        <div class="analog-buttons">
-            <button onclick="moveMap('up')">Up</button>
-            <br>
-            <button onclick="moveMap('left')">Left</button>
-            <button onclick="moveMap('right')">Right</button>
-            <br>
-            <button onclick="moveMap('down')">Down</button>
-        </div>
-
-    <script src="node_modules/leaflet/dist/leaflet.js"></script>
-    <script src="node_modules/colyseus.js/dist/colyseus.js"></script>
-    <script src="dist/multiplayers.js"></script>
-
-    <script>
-        const optionMaps = {
-            dragging: false, // Disable panning and scrolling
-            zoomControl: false // Disable zooming
-        }
-        var map = L.map('map', optionMaps).setView([-6.200000, 106.816666], 17);
-        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-        }).addTo(map);
-
-        function moveMap(direction) {
-            var step = 1; // Adjust the step size as needed
-            var currentCenter = map.getCenter();
-
-            switch (direction) {
-                case 'up':
-                    map.panTo([currentCenter.lat - (step / map.getZoom()), currentCenter.lng]);
-                    break;
-                case 'down':
-                    map.panTo([currentCenter.lat + (step / map.getZoom()), currentCenter.lng]);
-                    break;
-                case 'left':
-                    map.panTo([currentCenter.lat, currentCenter.lng - (step / map.getZoom())]);
-                    break;
-                case 'right':
-                    map.panTo([currentCenter.lat, currentCenter.lng + (step / map.getZoom())]);
-                    break;
-                default:
-                    break;
-            }
-        }
-    </script>
 </body>
 </html>

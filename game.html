@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ColySeus</title>   
+
+    <link href="node_modules/leaflet/dist/leaflet.css" rel="stylesheet">
+    <link href="node_modules/toastr/build/toastr.min.css" rel="stylesheet"/>
+
+    <style>
+        
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        #map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 100%;
+            z-index: 0;
+        }
+
+        .fafdaf {
+            position: absolute;
+            bottom: 20px;
+            left: 20px; /* Mengatur jarak dari kiri */
+            z-index: 1000;
+        }
+
+        #chat {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            padding: 10px;
+            max-width: 300px;
+            z-index: 1;
+        }
+
+        #chat-messages {
+            height: 200px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 5px;
+        }
+
+        #chat-input {
+            width: 100%;
+            padding: 5px;
+            margin-top: 5px;
+        }
+
+        button {
+            margin-top: 5px;
+        }
+
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <div id="chat">
+        <div id="chat-messages"></div>
+        <input type="text" id="chat-input" placeholder="Ketik pesan anda disini..." />
+        <button onclick="sendMessage()">Send</button>
+
+    <!-- Analog Buttons -->
+    <div class="analog-buttons">
+        <button onclick="moveMap('up')">Up</button>
+        <br>
+        <button onclick="moveMap('left')">Left</button>
+        <button onclick="moveMap('right')">Right</button>
+        <br>
+        <button onclick="moveMap('down')">Down</button>
+    </div>    
+    <audio controls" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+
+    <script src="node_modules/leaflet/dist/leaflet.js"></script>
+    <script src="node_modules/colyseus.js/dist/colyseus.js"></script>
+    <script src="node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="node_modules/toastr/toastr.js"></script>
+    <script src="dist/multiplayers.js"></script>
+    <script src="dist/dataPolyJakarta.js"></script>
+    <script src="dist/jawaBarat.js"></script>
+
+    <script>
+
+                const url = new URL(window.location.href);
+
+const params = new URLSearchParams(url.search);
+
+const nameValue = params.get('name');
+
+function generateRandomId() {
+  const timestamp = Date.now().toString(36); // Convert timestamp to base36 string
+  const randomString = Math.random().toString(36).substr(2, 5); // Random alphanumeric string
+  const randomId = `${timestamp}-${randomString}`;
+  return randomId;
+}
+
+// Example usage:
+const randomId = generateRandomId();
+
+        const options = {
+            // "id": localStorage.getItem('userId') ? localStorage.getItem('userId') : randomId,
+            // "name": localStorage.getItem('userName') ? localStorage.getItem('userName') : nameValue,
+            "id": randomId,
+            "name": nameValue,
+            "health": 100,
+            "armor": 0,
+            "speed": 100,
+            "position": {
+                "lat": 1292092.192,
+                "long": 13334324.182
+            }    
+        };
+
+        colyClient.connect("my_room", options).then(room => {
+            colyClient.addListeners();
+            
+            toastr.success("selamat ada join baru bernama " + nameValue);
+        }).catch(e => {
+            console.log("JOIN ERROR", e);
+        });
+
+
+        const optionMaps = {
+            dragging: false, // Disable panning and scrolling
+            zoomControl: false, // Disable zooming
+            scrollWheelZoom: false, // Menonaktifkan zoom dengan scroll
+            doubleClickZoom: false, // Menonaktifkan zoom dengan double click
+            touchZoom: false, // Menonaktifkan zoom dengan gesture pada perangkat mobile
+        }
+        const center = [-6.200000, 106.816666];
+        var map = L.map('map', optionMaps).setView(center, 17);
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        }).addTo(map);
+
+        // add icon to marker
+        var myIcon = L.icon({
+            iconUrl: 'assets/img/icon.png',
+            iconSize: [32, 32],
+            iconAnchor: [16, 16],
+        });
+        let marker = L.marker(center, {icon: myIcon}).addTo(map)
+
+        function moveMap(direction) {
+            var step = 0.005; // Adjust the step size as needed
+            var currentCenter = map.getCenter();
+
+            switch (direction) {
+                case 'up':
+                    map.panTo([currentCenter.lat + (step / map.getZoom()), currentCenter.lng]);
+                    break;
+                case 'down':
+                    map.panTo([currentCenter.lat - (step / map.getZoom()), currentCenter.lng]);
+                    break;
+                case 'left':
+                    map.panTo([currentCenter.lat, currentCenter.lng - (step / map.getZoom())]);
+                    break;
+                case 'right':
+                    map.panTo([currentCenter.lat, currentCenter.lng + (step / map.getZoom())]);
+                    break;
+                default:
+                    break;
+            }
+            colyClient.room.send('move', {
+                player_id: randomId,
+                position: {
+                    lat: map.getCenter().lat,
+                    long: map.getCenter().lng
+                }
+            });
+            marker.setLatLng(map.getCenter());
+        }
+
+        document.addEventListener("keydown", function(event) {
+    var key = event.key.toLowerCase();
+    switch (key) {
+      case "w": // Tombol "w" untuk bergerak ke atas (up)
+        moveMap("up");
+        break;
+      case "s": // Tombol "s" untuk bergerak ke bawah (down)
+        moveMap("down");
+        break;
+      case "a": // Tombol "a" untuk bergerak ke kiri (left)
+        moveMap("left");
+        break;
+      case "d": // Tombol "d" untuk bergerak ke kanan (right)
+        moveMap("right");
+        break;
+      default:
+        break;
+    }
+  });
+        function polyToGeoJSON(polyData) {
+            const lines = polyData.trim().split('\n');
+            const name = lines[0].trim();
+            const coordinates = lines.slice(2, lines.length - 2).map(line => {
+                const [lng, lat] = line.trim().split(/\s+/).map(Number);
+                return [lng, lat];
+            });
+
+            const geojson = {
+                type: 'Feature',
+                properties: {
+                    name: name
+                },
+                geometry: {
+                    type: 'Polygon',
+                    coordinates: [coordinates]
+                }
+            };
+            return geojson;
+        }
+
+        const geojsonPolygon = polyToGeoJSON(polyJakarta);
+        const gwoJawaBarat = polyToGeoJSON(jawaBarat);
+
+        // L.geoJSON(geojsonPolygon).addTo(map);
+        // L.geoJSON(gwoJawaBarat).addTo(map);
+
+        // Leaflet Map initialization
+
+        function getCurrentTime() {
+  const now = new Date();
+  const hours = String(now.getHours()).padStart(2, '0');
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  const seconds = String(now.getSeconds()).padStart(2, '0');
+  const currentTime = `${hours}:${minutes}:${seconds}`;
+  return currentTime;
+}
+
+
+
+
+function sendMessage() {
+    const message = document.getElementById('chat-input').value;
+    let data =  {
+        message_id: generateRandomId(),
+        type: 'public-message',
+        player_id: randomId,
+        player_name: nameValue,
+        message: message,
+        time: getCurrentTime()
+    }
+
+    if (message.trim() !== '') {
+        displayMessage(data);
+    }
+
+    document.getElementById('chat-input').value = '';
+    colyClient.room.send('send_message', data);
+}
+
+
+// Function to display received and sent messages in the chat box
+function displayMessage(data) {
+    const chatMessages = document.getElementById('chat-messages');
+    const newMessage = document.createElement('div');
+    newMessage.innerHTML = `${data.time}-<strong>${data.player_name}:</strong> ${data.message}`;
+    chatMessages.appendChild(newMessage);
+    chatMessages.scrollTop = chatMessages.scrollHeight; // Scroll to the bottom of the chat box
+}
+
+    </script>
+</body>
+</html>
