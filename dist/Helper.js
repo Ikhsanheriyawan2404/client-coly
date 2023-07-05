@@ -1,4 +1,4 @@
-class Helper {
+class HelperManager {
 
     getUserName() {
         const url = new URL(window.location.href);
@@ -16,6 +16,42 @@ class Helper {
         const randomId = `${timestamp}-${randomString}`;
         return randomId;
     }
+
+    /**
+     * @param {string} polyData
+     * @returns {object} geojson
+     */
+    getRandomPositionByPolygon(polyData) {
+        const lines = polyData.trim().split('\n');
+        const name = lines[0].trim();
+        const coordinates = lines.slice(2, lines.length - 2).map(line => {
+            const [lng, lat] = line.trim().split(/\s+/).map(Number);
+            return [lng, lat];
+        });
+
+        const geojson = {
+            type: 'Feature',
+            properties: {
+                name: name
+            },
+            geometry: {
+                type: 'Polygon',
+                coordinates: [coordinates]
+            }
+        };
+        return geojson;
+    }
+
+    /**
+     * 
+     * @param {number} min 
+     * @param {number} max 
+     * @returns @number
+     */
+    getRandomInRange(min,  max) {
+
+        return Math.random() * (max - min) + min;
+    }
 }
 
-const HelperObj = new Helper();
+const Helper = new HelperManager();

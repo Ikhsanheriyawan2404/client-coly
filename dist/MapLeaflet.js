@@ -10,11 +10,17 @@ class MapLeaflet {
 
         // this.center = null;
         this.zoom = 17;
-        this.center = [0, 0]
+        this.center = [
+            colyClient.options.position.lat,
+            colyClient.options.position.long,
+        ],
 
         // this.map = null;
         this.map = L.map('map', this.optionMaps).setView(this.center, this.zoom);
-        
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        }).addTo(this.map);
 
         // add icon to marker
         this.avatarIcon = L.icon({
@@ -23,7 +29,7 @@ class MapLeaflet {
             iconAnchor: [16, 16],
         });
 
-        this.marker = L.marker(this.center, {icon: this.avatarIcon})
+        this.marker = L.marker(this.center, {icon: this.avatarIcon}).addTo(this.map);
     }
 }
 

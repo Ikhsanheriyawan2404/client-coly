@@ -86,13 +86,12 @@
     <script src="node_modules/colyseus.js/dist/colyseus.js"></script>
     <script src="node_modules/jquery/dist/jquery.min.js"></script>
     <script src="node_modules/toastr/toastr.js"></script>
+    <script src="dist/Bounds.js"></script>
     <script src="dist/Helper.js"></script>
     <script src="dist/PlayerDetail.js"></script>
     <script src="dist/Player.js"></script>
     <script src="dist/multiplayers.js"></script>
     <script src="dist/MapLeaflet.js"></script>
-    <script src="dist/dataPolyJakarta.js"></script>
-    <script src="dist/jawaBarat.js"></script>
 
     <script>
 
@@ -116,13 +115,13 @@
             default:
                 break;
         }
-        colyClient.room.send('move', {
-            player_id: colyClient.options.id,
-            position: {
-                lat: Leaflet.map.getCenter().lat,
-                long: Leaflet.map.getCenter().lng
-            }
-        });
+        // colyClient.room.send('move', {
+        //     player_id: colyClient.options.id,
+        //     position: {
+        //         lat: Leaflet.map.getCenter().lat,
+        //         long: Leaflet.map.getCenter().lng
+        //     }
+        // });
         Leaflet.marker.setLatLng(Leaflet.map.getCenter());
     }
 
@@ -167,8 +166,6 @@
         return geojson;
     }
 
-    const geojsonPolygon = polyToGeoJSON(polyJakarta);
-    const gwoJawaBarat = polyToGeoJSON(jawaBarat);
 
     // L.geoJSON(geojsonPolygon).addTo(Leaflet.map);
     // L.geoJSON(gwoJawaBarat).addTo(Leaflet.map);
@@ -185,7 +182,7 @@
     function sendMessage() {
         const message = document.getElementById('chat-input').value;
         let data =  {
-            message_id: HelperObj.generateRandomId(),
+            message_id: Helper  .generateRandomId(),
             type: 'public-message',
             player_id: colyClient.options.id,
             player_name: colyClient.options.name,

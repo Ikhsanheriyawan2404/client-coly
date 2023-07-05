@@ -6,31 +6,24 @@ class ColyClient {
   options;
 
 	constructor() {
-		this.serverUrl = "ws://localhost:2567";
+    this.port = 3019;
+		this.serverUrl = `ws://localhost:${this.port}`;
     this.userId = null;
 		this.client = new Colyseus.Client(this.serverUrl);
 
 		this.room = null;
-
-    this.options = {
-      "id": HelperObj.generateRandomId(),
-      "name": HelperObj.getUserName(),
-      // "health": 100,
-      // "armor": 0,
-      // "speed": 100,
-      // "position": {
-      //   "lat": 1292092.192,
-      //   "long": 13334324.182
-      // }
-    };
-
+    
     this.user = null;
-
+    this.setPlayer();
     this.connectToServer();
 	}
 
-  connectToServer() {
-    this.client.joinOrCreate("my_room", this.options).then(room => {
+  setPlayer() {
+    this.options = Player.addPlayer();
+  }
+
+  async connectToServer() {
+    await this.client.joinOrCreate("my_room", this.options).then(room => {
       colyClient.room = room;
       this.addListeners();
     }).catch(e => {
@@ -38,14 +31,15 @@ class ColyClient {
     });
   }
 
-	async connect(roomName, options) {
-    try {
-      this.room = await this.client.joinOrCreate(roomName, options);
-      console.log("Joined room:", this.room.name);
-    } catch (error) {
-      console.error("Error joining or creating room:", error);
-    }
-  }
+	// async connect(roomName, options) {
+  //   try {
+  //     this.room = await this.client.joinOrCreate(roomName, options);
+  //     console.log(this.room.state.Player)
+  //     console.log("Joined room:", this.room.name);
+  //   } catch (error) {
+  //     console.error("Error joining or creating room:", error);
+  //   }
+  // }
 
   _StatePlayer(player, key) {
     //
