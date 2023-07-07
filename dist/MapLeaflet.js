@@ -1,19 +1,17 @@
 class MapLeaflet {
-    constructor() {
-        this.optionMaps = {
-            dragging: false,
-            zoomControl: false,
-            scrollWheelZoom: false,
-            doubleClickZoom: false,
-            touchZoom: false,
-        }
+    constructor(lat, long) {
+        this.optionMaps = {}
 
         // this.center = null;
         this.zoom = 17;
         this.center = [
-            colyClient.options.position.lat,
-            colyClient.options.position.long,
-        ],
+            lat,
+            long,
+        ];
+        // this.center = [
+        //     colyClient.options.position.lat,
+        //     colyClient.options.position.long,
+        // ],
 
         // this.map = null;
         this.map = L.map('map', this.optionMaps).setView(this.center, this.zoom);
@@ -32,5 +30,3 @@ class MapLeaflet {
         this.marker = L.marker(this.center, {icon: this.avatarIcon}).addTo(this.map);
     }
 }
-
-const Leaflet = new MapLeaflet();
