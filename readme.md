@@ -20,6 +20,23 @@ Game Treasure Hunter ini adalah multiplayer game berbasi colyseus sebagai server
 - "leaflet": "^1.9.4",
 
 ## Instalasi
+### Instalasi Server Colyseus
+
+1. Clone repositori ini ke mesin lokalmu.
+```bash
+git clone https://github.com/ikhsanheriyawan2404/treasure-hunter-colyseus.git
+```
+
+2. Install dependensi.
+```bash
+npm install
+```
+
+3. Jalankan servicenya.
+```bash
+npm run start
+```
+### Instalasi Frontend
 1. Clone repositori ini ke mesin lokalmu.
 ```bash
 git clone https://github.com/ikhsanheriyawan2404/client-coly.git
