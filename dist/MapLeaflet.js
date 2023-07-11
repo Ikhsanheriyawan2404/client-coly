@@ -1,12 +1,20 @@
 class MapLeaflet {
-    constructor(lat, long) {
+    constructor() {
+        this.optionMaps = {
+            dragging: false,
+            zoomControl: false,
+            scrollWheelZoom: false,
+            doubleClickZoom: false,
+            touchZoom: false,
+        }
+
         this.optionMaps = {}
 
         // this.center = null;
         this.zoom = 17;
         this.center = [
-            lat,
-            long,
+            0,
+            0,
         ];
         // this.center = [
         //     colyClient.options.position.lat,
@@ -27,6 +35,18 @@ class MapLeaflet {
             iconAnchor: [16, 16],
         });
 
-        this.marker = L.marker(this.center, {icon: this.avatarIcon}).addTo(this.map);
+        this.marker = L.marker(this.center, {icon: this.avatarIcon});
+
+        L.control.compass({
+            position: 'topright',
+            autoActive: true,
+            showDigit: true,
+            digitStyle: {
+                color: 'white',
+                fontSize: '16px'
+            }
+        }).addTo(this.map);
     }
 }
+
+const Leaflet = new MapLeaflet()

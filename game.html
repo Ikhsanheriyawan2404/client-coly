@@ -7,7 +7,8 @@
 
     <link href="node_modules/leaflet/dist/leaflet.css" rel="stylesheet">
     <link href="node_modules/toastr/build/toastr.min.css" rel="stylesheet"/>
-
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-compass/dist/leaflet-compass.min.css" />
+    
     <style>
         
         body {
@@ -67,7 +68,7 @@
     <div id="chat">
         <div id="chat-messages"></div>
         <input type="text" id="chat-input" placeholder="Ketik pesan anda disini..." />
-        <button onclick="sendMessage()">Send</button>
+        <button onclick="Helper.sendMessage()">Send</button>
 
     <!-- Analog Buttons -->
     <div class="analog-buttons">
@@ -83,125 +84,48 @@
     </audio>
 
     <script src="node_modules/leaflet/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet-compass/dist/leaflet-compass.min.js"></script>
     <script src="node_modules/colyseus.js/dist/colyseus.js"></script>
     <script src="node_modules/jquery/dist/jquery.min.js"></script>
     <script src="node_modules/toastr/toastr.js"></script>
     <script src="dist/Bounds.js"></script>
-    <script src="dist/Helper.js"></script>
     <script src="dist/PlayerDetail.js"></script>
     <script src="dist/Player.js"></script>
-    <script src="dist/multiplayers.js"></script>
     <script src="dist/MapLeaflet.js"></script>
+    <script src="dist/Helper.js"></script>
+    <script src="dist/multiplayers.js"></script>
 
     <script>
-
-    function moveMap(direction) {
-        var step = 0.005; // Adjust the step size as needed
-        var currentCenter = Leaflet.map.getCenter();
-
-        switch (direction) {
-            case 'up':
-                Leaflet.map.panTo([currentCenter.lat + (step / Leaflet.map.getZoom()), currentCenter.lng]);
-                break;
-            case 'down':
-                Leaflet.map.panTo([currentCenter.lat - (step / Leaflet.map.getZoom()), currentCenter.lng]);
-                break;
-            case 'left':
-                Leaflet.map.panTo([currentCenter.lat, currentCenter.lng - (step / Leaflet.map.getZoom())]);
-                break;
-            case 'right':
-                Leaflet.map.panTo([currentCenter.lat, currentCenter.lng + (step / Leaflet.map.getZoom())]);
-                break;
-            default:
-                break;
-        }
-        // colyClient.room.send('move', {
-        //     player_id: colyClient.options.id,
-        //     position: {
-        //         lat: Leaflet.map.getCenter().lat,
-        //         long: Leaflet.map.getCenter().lng
-        //     }
-        // });
-        Leaflet.marker.setLatLng(Leaflet.map.getCenter());
-    }
 
     document.addEventListener("keydown", function(event) {
         var key = event.key.toLowerCase();
         switch (key) {
         case "w": // Tombol "w" untuk bergerak ke atas (up)
-            moveMap("up");
+            Helper.moveMap("up");
             break;
         case "s": // Tombol "s" untuk bergerak ke bawah (down)
-            moveMap("down");
+            Helper.moveMap("down");
             break;
         case "a": // Tombol "a" untuk bergerak ke kiri (left)
-            moveMap("left");
+            Helper.moveMap("left");
             break;
         case "d": // Tombol "d" untuk bergerak ke kanan (right)
-            moveMap("right");
+            Helper.moveMap("right");
             break;
         default:
             break;
         }
     });
 
-    function polyToGeoJSON(polyData) {
-        const lines = polyData.trim().split('\n');
-        const name = lines[0].trim();
-        const coordinates = lines.slice(2, lines.length - 2).map(line => {
-            const [lng, lat] = line.trim().split(/\s+/).map(Number);
-            return [lng, lat];
-        });
+    Leaflet.center = [
+        -7.78278,
+        110.36083
+    ];
 
-        const geojson = {
-            type: 'Feature',
-            properties: {
-                name: name
-            },
-            geometry: {
-                type: 'Polygon',
-                coordinates: [coordinates]
-            }
-        };
-        return geojson;
-    }
-
-
-    // L.geoJSON(geojsonPolygon).addTo(Leaflet.map);
-    // L.geoJSON(gwoJawaBarat).addTo(Leaflet.map);
-
-    function getCurrentTime() {
-        const now = new Date();
-        const hours = String(now.getHours()).padStart(2, '0');
-        const minutes = String(now.getMinutes()).padStart(2, '0');
-        const seconds = String(now.getSeconds()).padStart(2, '0');
-        const currentTime = `${hours}:${minutes}:${seconds}`;
-        return currentTime;
-    }
-
-    function sendMessage() {
-        const message = document.getElementById('chat-input').value;
-        let data =  {
-            message_id: Helper  .generateRandomId(),
-            type: 'public-message',
-            player_id: colyClient.options.id,
-            player_name: colyClient.options.name,
-            message: message,
-            time: getCurrentTime()
-        }
-
-        document.getElementById('chat-input').value = '';
-        colyClient.room.send('send_message', data);
-    }
-
-
-    function displayMessage(data) {
-        const chatMessages = document.getElementById('chat-messages');
-        const newMessage = document.createElement('div');
-        newMessage.innerHTML = `${data.time}-<strong>${data.player_name}:</strong> ${data.message}`;
-        chatMessages.appendChild(newMessage);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
+    // change location view
+    Leaflet.map.setView(Leaflet.center, 17);
+    // set marker
+    Leaflet.marker = L.marker(Leaflet.center, {icon: Leaflet.avatarIcon}).addTo(Leaflet.map);
 
     </script>
 </body>

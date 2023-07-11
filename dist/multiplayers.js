@@ -32,6 +32,7 @@ class ColyClient {
   async connectToServer() {
     await this.client.joinOrCreate("my_room", this.options).then(room => {
       colyClient.room = room;
+      localStorage.setItem("player_id", room.sessionId)
       this.addListeners();
     }).catch(e => {
       console.log("JOIN ERROR", e);
@@ -54,14 +55,24 @@ class ColyClient {
 
 	addListeners() {
     if (this.room) {
-      this.room.onStateChange.once((state) => {
+      this.room.onStateChange((state) => {
         
 
         state.Message.$items.forEach((messages, key) => {
-          displayMessage(messages);
-
-          
+          Helper.displayMessage(messages);
         });
+
+        state.Player.$items.forEach((player, key) => {
+          let dataPlayer = player;
+          const center = [dataPlayer.position.lat, dataPlayer.position.long];
+          dataPlayer.marker = L.marker(center, {icon: Leaflet.avatarIcon});
+          Player.addPlayer(dataPlayer);
+        });
+
+        state.ObjectMap.$items.forEach((messages, key) => {
+          // Leaflet.plotObject(messages);
+        });
+
       })
 
 
@@ -72,27 +83,25 @@ class ColyClient {
       this.room.onMessage("send_message", (message) => {
         if (message.message.trim() !== '') {
           toastr.info(`ada pesan masuk`);
-          displayMessage(message);
+          Helper.displayMessage(message);
         }
-      });
-
-      this.room.onMessage("move", (data) => {
-        // set marker position
-
       });
 
       this.room.onMessage("onJoin", (message) => {
         toastr.success(`${message.message} ${message.id}`);
-        Player.addPlayer(message.player);
-        const Leaflet = new MapLeaflet(message.player.position.lat, message.player.position.long);
-        // Leaflet.center = [
-        //   message.player.position.lat,
-        //   message.player.position.long,
-        // ];
+      });
+
+      
+      this.room.onMessage("move", (message) => {
+        console.log(message.player_id, "bergerak")
+        console.log(message.position.lat, message.position.long)
+        let player = Player.getPlayer(message.id)
+        player.moveIcon(message.position.lat, message.position.long);
       });
 
       this.room.onMessage("onLeave", (message) => {
         toastr.error(`${message} meninggalkan permainan!`);
+        Player.removePlayer(message);
       });
 
       this.room.state.Player.onRemove = (players, key) => {

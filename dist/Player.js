@@ -1,7 +1,6 @@
 class EntityPlayer {
     #players = [];
     constructor() {
-        console.log(this.#players)
     }
   
     addPlayer(objects) {
@@ -19,7 +18,8 @@ class EntityPlayer {
           "position": {
             "lat": objects.position.lat,
             "long": objects.position.long
-          }
+          },
+          "marker": objects.marker,
         };
 
         const newPlayer = new PlayerDetail(player);
@@ -27,9 +27,10 @@ class EntityPlayer {
 
         return player;
     }
-  
+
     getPlayer(id) {
-        return this.players.get(id);
+        const player = this.#players.find(player => player.id === id);
+        return player ? player : null;
     }
   
     updatePlayer(id, name, score) {
@@ -40,8 +41,14 @@ class EntityPlayer {
         }
     }
   
-    removePlayer(id) {
-        this.players.delete(id);
+    removePlayer(playerId) {
+        const index = this.#players.findIndex(player => player.id === playerId);
+        if (index !== -1) {
+            this.#players.splice(index, 1);
+            console.log(`Player with ID ${playerId} has been removed.`);
+        } else {
+            console.log(`Player with ID ${playerId} does not exist.`);
+        }
     }
   
     getAllPlayers() {

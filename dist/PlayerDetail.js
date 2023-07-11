@@ -1,4 +1,5 @@
 class PlayerDetail {
+
     constructor(objects) {
         this.id = objects.id;
         this.name = objects.name;
@@ -10,6 +11,27 @@ class PlayerDetail {
             lat: objects.position.lat,
             long: objects.position.long
         }
+        this.marker = objects.marker;
+    }
+
+    // plotIcon = () => {
+    //     // push to maps
+    //     const center = [
+    //         this.position.lat,
+    //         this.position.long,
+    //     ];
+    //     // Leaflet.map.setView(Leaflet.center, Leaflet.zoom);
+    //     Leaflet.marker = L.marker(center, {icon: Leaflet.avatarIcon}).addTo(Leaflet.map);
+    // }
+
+    moveIcon = (lat, long) => {
+        // push to maps
+        const center = [
+            lat,
+            long,
+        ];
+        // Leaflet.map.s
+        this.marker.setLatLng(center).addTo(Leaflet.map);        
     }
 
     setSpeed(speed) {
