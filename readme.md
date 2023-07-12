@@ -13,7 +13,12 @@ Game Treasure Hunter ini adalah multiplayer game berbasi colyseus sebagai server
 ## List Harapan & Ide ide kedepan
 - Frontend agak bagus dikit lah ya masa masih pake native gini. minimal vue atau apa gtu.
 - Integrasi dengan backend sehingga bisa menerapkan user daftar dan logon untuk play game ini. repo backend sudah ada tinggal dikembangin lagi https://github.com/Ikhsanheriyawan2404/treasure-hunter-express
-- selanjutnya bisa klik disini
+- Hal yang bisa kita explore disini yaitu:
+- Framework ColySeus
+- Typescript
+- Vue (jika frontend menggunakan Vue)
+- Library Leaflet
+- 
 
 ## Prasyarat
 - "colyseus.js": "^0.15.9",
@@ -48,9 +53,6 @@ npm install
 ```
 
 3. Buka http://localhost/client-coly-main dibrowser local anda
-
-## Penggunaan
-Jelaskan cara menggunakan proyekmu di sini.
 
 ## Kontribusi
 Jika kamu ingin berkontribusi pada proyek ini, silakan ikuti langkah-langkah berikut:
