@@ -55,22 +55,26 @@ class ColyClient {
 
 	addListeners() {
     if (this.room) {
-      this.room.onStateChange((state) => {
-        
 
+      this.room.onStateChange.once((state) => {
         state.Message.$items.forEach((messages, key) => {
+          console.log(messages)
           Helper.displayMessage(messages);
         });
+
+        
+        state.ObjectMap.$items.forEach((object, key) => {
+          Leaflet.plotObject(object);
+        });
+      });
+
+      this.room.onStateChange((state) => {
 
         state.Player.$items.forEach((player, key) => {
           let dataPlayer = player;
           const center = [dataPlayer.position.lat, dataPlayer.position.long];
           dataPlayer.marker = L.marker(center, {icon: Leaflet.avatarIcon});
           Player.addPlayer(dataPlayer);
-        });
-
-        state.ObjectMap.$items.forEach((messages, key) => {
-          // Leaflet.plotObject(messages);
         });
 
       })

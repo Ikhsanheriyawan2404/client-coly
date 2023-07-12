@@ -8,7 +8,9 @@ class MapLeaflet {
             touchZoom: false,
         }
 
-        this.optionMaps = {}
+        this.allObjectMap = [];
+
+        // this.optionMaps = {}
 
         // this.center = null;
         this.zoom = 17;
@@ -46,6 +48,43 @@ class MapLeaflet {
                 fontSize: '16px'
             }
         }).addTo(this.map);
+    }
+
+    plotObject(object) {
+        let properties = JSON.parse(object.properties);
+        let objectMap = null;
+        if (object.type == "explosion" || object.type == "item") {
+            const center = [properties.lat, properties.long];
+            objectMap = L.circle(center, {
+                color: object.type == "explosion" ? 'red' : 'green',
+                fillColor: '#f03',
+                fillOpacity: 0.5,
+                radius: properties.radius
+            });
+        } else if (object.type == "wall" || object.type == "weather") {
+            switch (properties.type) {
+                case "polyline":
+                    console.log(properties.poly)
+                    objectMap = L.polyline(properties.poly, {
+                        color: 'red',
+                        weight: 3,
+                        opacity: 0.5,
+                        smoothFactor: 1
+                    });
+                    break;
+                case "polygon":
+                    objectMap = L.polygon(properties.poly, {
+                        color: 'red',
+                        weight: 3,
+                        opacity: 0.5,
+                        smoothFactor: 1
+                    });
+                    break;
+            }
+        }
+
+        this.allObjectMap.push(object);
+        objectMap.addTo(this.map).bindPopup(object.type);
     }
 }
 

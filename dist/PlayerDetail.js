@@ -12,6 +12,8 @@ class PlayerDetail {
             long: objects.position.long
         }
         this.marker = objects.marker;
+
+        Leaflet.map.setView([this.position.lat, this.position.long], Leaflet.zoom);
     }
 
     // plotIcon = () => {
