@@ -82,7 +82,8 @@ class MapLeaflet {
             }
         }
 
-        this.allObjectMap.push(object);
+        let newObject = new ObjectMap(object);
+        this.allObjectMap.push(newObject);
         objectMap.addTo(this.map).bindPopup(object.type);
     }
 }

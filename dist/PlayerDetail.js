@@ -33,6 +33,10 @@ class PlayerDetail {
         this.marker.setLatLng(center).addTo(Leaflet.map);        
     }
 
+    getId() {
+        return this.id;
+    }
+
     setSpeed(speed) {
         this.speed = speed;
     }

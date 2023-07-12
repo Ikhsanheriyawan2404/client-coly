@@ -26,6 +26,10 @@ class EntityPlayer {
         this.#players.push(newPlayer);
     }
 
+    getAllPlayer() {
+        return this.#players;
+    }
+
     getPlayer(id) {
         const player = this.#players.find(player => player.id === id);
         return player ? player : null;
