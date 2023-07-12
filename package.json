@@ -3,6 +3,7 @@
     "colyseus.js": "^0.15.9",
     "jquery": "^3.7.0",
     "leaflet": "^1.9.4",
+    "leaflet-plugin-trackplayback": "^1.0.5",
     "leaflet.motion": "^0.3.2",
     "toastr": "^2.1.4"
   }

@@ -8,7 +8,8 @@
     <link href="node_modules/leaflet/dist/leaflet.css" rel="stylesheet">
     <link href="node_modules/toastr/build/toastr.min.css" rel="stylesheet"/>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-compass/dist/leaflet-compass.min.css" />
-    
+    <link rel="stylesheet" href="node_modules/leaflet-plugin-trackplayback/dist/control.playback.css">
+
     <style>
         
         body {
@@ -72,12 +73,12 @@
 
     <!-- Analog Buttons -->
     <div class="analog-buttons">
-        <button onclick="Leaflet.map('up')">Up</button>
+        <button onclick="Helper.moveMap('up')">Up</button>
         <br>
-        <button onclick="Leaflet.map('left')">Left</button>
-        <button onclick="Leaflet.map('right')">Right</button>
+        <button onclick="Helper.moveMap('left')">Left</button>
+        <button onclick="Helper.moveMap('right')">Right</button>
         <br>
-        <button onclick="Leaflet.map('down')">Down</button>
+        <button onclick="Helper.moveMap('down')">Down</button>
     </div>    
     <audio controls" type="audio/mpeg">
         Your browser does not support the audio element.
@@ -85,6 +86,8 @@
 
     <script src="node_modules/leaflet/dist/leaflet.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/leaflet-compass/dist/leaflet-compass.min.js"></script>
+    <script src="node_modules/leaflet-plugin-trackplayback/dist/control.trackplayback.js"></script>
+    <script src="node_modules/leaflet-plugin-trackplayback/dist/leaflet.trackplayback.js"></script>
     <script src="node_modules/colyseus.js/dist/colyseus.js"></script>
     <script src="node_modules/jquery/dist/jquery.min.js"></script>
     <script src="node_modules/toastr/toastr.js"></script>

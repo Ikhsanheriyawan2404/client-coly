@@ -69,11 +69,14 @@ class ColyClient {
 
         state.Player.$items.forEach((player, key) => {
           if (player.id == localStorage.getItem('player_id')) {
-            console.log('wak')
             Leaflet.map.setView([
               player.position.lat,
               player.position.long
             ], Leaflet.zoom);
+
+            // trackplayback
+            
+
             // Leaflet.marker = L.marker([
             //   player.position.lat,
             //   player.position.long
