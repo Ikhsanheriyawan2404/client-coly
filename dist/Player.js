@@ -41,6 +41,8 @@ class EntityPlayer {
   
     removePlayer(playerId) {
         const index = this.#players.findIndex(player => player.id === playerId);
+        // remove marker
+        this.#players[index].marker.remove();
         if (index !== -1) {
             this.#players.splice(index, 1);
             console.log(`Player with ID ${playerId} has been removed.`);

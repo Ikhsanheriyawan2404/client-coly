@@ -68,16 +68,25 @@ class ColyClient {
         });
 
         state.Player.$items.forEach((player, key) => {
-          let dataPlayer = player;
-          const center = [dataPlayer.position.lat, dataPlayer.position.long];
-          dataPlayer.marker = L.marker(center, {icon: Leaflet.avatarIcon});
-          Player.addPlayer(dataPlayer);
+          if (player.id == localStorage.getItem('player_id')) {
+            console.log('wak')
+            Leaflet.map.setView([
+              player.position.lat,
+              player.position.long
+            ], Leaflet.zoom);
+            // Leaflet.marker = L.marker([
+            //   player.position.lat,
+            //   player.position.long
+            // ], {icon: Leaflet.avatarIcon}).addTo(Leaflet.map);
+          }
         });
 
         state.Player.onAdd((player, key) => {
           console.log("onadd")
           let dataPlayer = player;
           const center = [dataPlayer.position.lat, dataPlayer.position.long];
+          Leaflet.center = center;
+          
           dataPlayer.marker = L.marker(center, {icon: Leaflet.avatarIcon});
           Player.addPlayer(dataPlayer);
         })
@@ -91,11 +100,6 @@ class ColyClient {
         // });
         
       })
-
-
-      this.room.state.Player.onAdd = (players, key) => {
-        console.log('onadd')
-      }
 
       this.room.onMessage("send_message", (message) => {
         if (message.message.trim() !== '') {

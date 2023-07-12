@@ -10,7 +10,7 @@ class MapLeaflet {
 
         this.allObjectMap = [];
 
-        this.optionMaps = {}
+        // this.optionMaps = {}
 
         // this.center = null;
         this.zoom = 17;
