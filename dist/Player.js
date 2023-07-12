@@ -24,8 +24,6 @@ class EntityPlayer {
 
         const newPlayer = new PlayerDetail(player);
         this.#players.push(newPlayer);
-
-        return player;
     }
 
     getPlayer(id) {

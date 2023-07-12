@@ -34,6 +34,7 @@ class ColyClient {
       colyClient.room = room;
       localStorage.setItem("player_id", room.sessionId)
       this.addListeners();
+      console.log("JOIN SUCCESS", room);
     }).catch(e => {
       console.log("JOIN ERROR", e);
     });
@@ -58,7 +59,6 @@ class ColyClient {
 
       this.room.onStateChange.once((state) => {
         state.Message.$items.forEach((messages, key) => {
-          console.log(messages)
           Helper.displayMessage(messages);
         });
 
@@ -66,9 +66,6 @@ class ColyClient {
         state.ObjectMap.$items.forEach((object, key) => {
           Leaflet.plotObject(object);
         });
-      });
-
-      this.room.onStateChange((state) => {
 
         state.Player.$items.forEach((player, key) => {
           let dataPlayer = player;
@@ -77,6 +74,22 @@ class ColyClient {
           Player.addPlayer(dataPlayer);
         });
 
+        state.Player.onAdd((player, key) => {
+          console.log("onadd")
+          let dataPlayer = player;
+          const center = [dataPlayer.position.lat, dataPlayer.position.long];
+          dataPlayer.marker = L.marker(center, {icon: Leaflet.avatarIcon});
+          Player.addPlayer(dataPlayer);
+        })
+
+      });
+
+      this.room.onStateChange((state) => {
+
+        // state.Player.$items.forEach((player, key) => {
+        //   console.log("perubahan")
+        // });
+        
       })
 
 
@@ -97,8 +110,6 @@ class ColyClient {
 
       
       this.room.onMessage("move", (message) => {
-        console.log(message.player_id, "bergerak")
-        console.log(message.position.lat, message.position.long)
         let player = Player.getPlayer(message.id)
         player.moveIcon(message.position.lat, message.position.long);
       });

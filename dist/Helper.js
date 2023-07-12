@@ -57,6 +57,8 @@ class HelperManager {
     }
 
     moveMap(direction) {
+        const player = Player.getPlayer(localStorage.getItem('player_id'));
+        // console.log(player)
         var step = 0.005; // Adjust the step size as needed
         var currentCenter = this.Leaflet.map.getCenter();
 
@@ -78,7 +80,7 @@ class HelperManager {
         }
         colyClient.room.send('move', {
             player_id: colyClient.options.id,
-            id: localStorage.getItem('player_id'),
+            id: player.id,
             position: {
                 lat: this.Leaflet.map.getCenter().lat,
                 long: this.Leaflet.map.getCenter().lng

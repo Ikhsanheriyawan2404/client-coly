@@ -27,12 +27,10 @@ class PlayerDetail {
     // }
 
     moveIcon = (lat, long) => {
-        // push to maps
         const center = [
             lat,
             long,
         ];
-        // Leaflet.map.s
         this.marker.setLatLng(center).addTo(Leaflet.map);        
     }
 

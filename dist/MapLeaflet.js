@@ -10,7 +10,7 @@ class MapLeaflet {
 
         this.allObjectMap = [];
 
-        // this.optionMaps = {}
+        this.optionMaps = {}
 
         // this.center = null;
         this.zoom = 17;
@@ -64,7 +64,6 @@ class MapLeaflet {
         } else if (object.type == "wall" || object.type == "weather") {
             switch (properties.type) {
                 case "polyline":
-                    console.log(properties.poly)
                     objectMap = L.polyline(properties.poly, {
                         color: 'red',
                         weight: 3,
