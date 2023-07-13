@@ -67,6 +67,10 @@ class ColyClient {
           Leaflet.plotObject(object);
         });
 
+        state.BotEnemy.$items.forEach((bot, key) => {
+          Leaflet.plotEnemyBot(bot);
+        });
+
         state.Player.$items.forEach((player, key) => {
           if (player.id == localStorage.getItem('player_id')) {
             Leaflet.map.setView([

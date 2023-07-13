@@ -9,34 +9,34 @@ class ObjectMap {
         this.listDetect = [];
     }
 
-    detectPlayerMovement = (objectId = null) => {
-        let object = this;
-        let interval_ = window.setInterval(() => {
-            let players = Player.getAllPlayer();
-            for (const player of players) {
+    // detectPlayerMovement = (objectId = null) => {
+    //     let object = this;
+    //     let interval_ = window.setInterval(() => {
+    //         let players = Player.getAllPlayer();
+    //         for (const player of players) {
 
-                let detectedEntity = object.listDetect.includes(player.getId());
+    //             let detectedEntity = object.listDetect.includes(player.getId());
 
-                let intersection = this.checkIntersectCircle(player, object);
+    //             let intersection = this.checkIntersectCircle(player, object);
 
-                if (intersection) {
+    //             if (intersection) {
 
-                    if(detectedEntity === false) 
-                    {
-                        object.listDetect.push(player.getId());
-                    }
-                } else {
-                    if (detectedEntity) {
-                        let index = object.listDetect.indexOf(player.getId());
-                        object.listDetect.splice(index, 1);
-                    }
-                }
-            }
-        }, 1000);
-        object.interval = interval_;
-    }
+    //                 if(detectedEntity === false) 
+    //                 {
+    //                     object.listDetect.push(player.getId());
+    //                 }
+    //             } else {
+    //                 if (detectedEntity) {
+    //                     let index = object.listDetect.indexOf(player.getId());
+    //                     object.listDetect.splice(index, 1);
+    //                 }
+    //             }
+    //         }
+    //     }, 1000);
+    //     object.interval = interval_;
+    // }
 
-    checkIntersectCircle = (player, object) => {
-        //
-    }
+    // checkIntersectCircle = (player, object) => {
+    //     //
+    // }
 }

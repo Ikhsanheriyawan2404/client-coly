@@ -7,8 +7,9 @@ class MapLeaflet {
             doubleClickZoom: false,
             touchZoom: false,
         }
-
+        this.trackplayback = null;
         this.allObjectMap = [];
+        this.botEnemy = [];
 
         // this.optionMaps = {}
 
@@ -57,7 +58,7 @@ class MapLeaflet {
             const center = [properties.lat, properties.long];
             objectMap = L.circle(center, {
                 color: object.type == "explosion" ? 'red' : 'green',
-                fillColor: '#f03',
+                // fillColor: '#f03',
                 fillOpacity: 0.5,
                 radius: properties.radius
             });
@@ -85,6 +86,72 @@ class MapLeaflet {
         let newObject = new ObjectMap(object);
         this.allObjectMap.push(newObject);
         objectMap.addTo(this.map).bindPopup(object.type);
+    }
+
+    plotEnemyBot(object) {
+        let objectMap = null;
+
+        let newObject = new BotEnemy(object);
+        this.botEnemy.push(newObject);
+
+       
+    }
+
+    setPergerakanBot()
+    {
+        const data = [];
+        for (const bot of this.botEnemy) {
+            const newObject = bot;
+            let row = [];
+            const startTime = moment(); // Waktu awal
+            const timeInterval = 1_000_000_000; // Interval waktu (dalam milidetik)
+
+            for (const coord of newObject.movement.poly) {
+                const timestamp = moment(startTime).add(timeInterval, 'miliseconds').unix(); // Menambahkan detik ke waktu awal
+                row.push({
+                    lat: coord.lat,
+                    lng: coord.long,
+                    time: timestamp,// setting waktu disini,
+                    info: []
+                });
+                startTime.add(timeInterval, 'milliseconds'); // Menambahkan interval waktu ke waktu awal untuk iterasi selanjutnya
+            }
+            data.push(row)
+        }
+        
+        console.log(data)
+        const trackplayback = L.trackplayback(data, this.map, {
+            targetOptions: {
+                useImg: true,
+                imgUrl: 'assets/img/ship.png'
+            },
+            clockOptions: {
+                speed: 20,
+                maxSpeed: 65
+            },
+            trackLineOptions: {
+                // whether draw track line
+                isDraw: true,
+                stroke: true,
+                color: '#1C54E2',
+                weight: 2,
+                fill: false,
+                fillColor: '#000',
+                opacity: 0.3
+            },
+        });
+
+        trackplayback.start();
+        // trackplayback.showTrackLine();
+
+       
+        // trackplayback.rePlaying();
+        const trackplaybackControl = L.trackplaybackcontrol(trackplayback);
+        trackplaybackControl.addTo(this.map);
+        // hide control on maps
+        // trackplaybackControl.hide();
+
+        this.trackplayback = trackplayback;
     }
 }
 
