@@ -9,6 +9,7 @@ Game Treasure Hunter ini adalah multiplayer game berbasi colyseus sebagai server
 - Player bisa saling interaksi dengan player seperti chat, movement di maps, dan berebut treasure
 - Fitur 2
 - Fitur 3
+- Baca selengkapnya disini https://github.com/Ikhsanheriyawan2404/client-coly/wiki
 
 ## List Harapan & Ide ide kedepan
 - Frontend agak bagus dikit lah ya masa masih pake native gini. minimal vue atau apa gtu.
