@@ -133,30 +133,30 @@
     // // set marker
 
     // delete this interval
-    let startTrackPlayback = setInterval(function() {
-        Leaflet.setPergerakanBot()
-        // get element by class
-        let element = document.getElementsByClassName('leaflet-control-playback leaflet-control');
-        // style display none element
-        element[0].style.display = 'none';
-        console.log('startTrackPlayback')
-    }, 5000);
+    // let startTrackPlayback = setInterval(function() {
+    //     Leaflet.setPergerakanBot()
+    //     // get element by class
+    //     let element = document.getElementsByClassName('leaflet-control-playback leaflet-control');
+    //     // style display none element
+    //     element[0].style.display = 'none';
+    //     console.log('startTrackPlayback')
+    // }, 5000);
 
-    setTimeout(function() {
-        clearInterval(startTrackPlayback);
-    }, 10000);
+    // setTimeout(function() {
+    //     clearInterval(startTrackPlayback);
+    // }, 10000);
 
-    setInterval(function() {
-        if (Leaflet.trackplayback != null) {
-            console.log('check pl.ayback')
-            if (Leaflet.trackplayback.isPlaying() == false) {
-                Leaflet.trackplayback.rePlaying();
-                console.log('replay')
-            }
-        } else {
-            console.log('belum ada playback')
-        }
-    }, 1000);
+    // setInterval(function() {
+    //     if (Leaflet.trackplayback != null) {
+    //         console.log('check pl.ayback')
+    //         if (Leaflet.trackplayback.isPlaying() == false) {
+    //             Leaflet.trackplayback.rePlaying();
+    //             console.log('replay')
+    //         }
+    //     } else {
+    //         console.log('belum ada playback')
+    //     }
+    // }, 1000);
     </script>
 </body>
 

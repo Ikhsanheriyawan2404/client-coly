@@ -1,11 +1,11 @@
 class MapLeaflet {
     constructor() {
         this.optionMaps = {
-            dragging: false,
-            zoomControl: false,
-            scrollWheelZoom: false,
-            doubleClickZoom: false,
-            touchZoom: false,
+            // dragging: false,
+            // zoomControl: false,
+            // scrollWheelZoom: false,
+            // doubleClickZoom: false,
+            // touchZoom: false,
         }
         this.trackplayback = null;
         this.allObjectMap = [];
