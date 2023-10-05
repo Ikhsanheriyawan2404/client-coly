@@ -82,7 +82,8 @@ class HelperManager {
         }
 
         this.Leaflet.map.panTo(newCenter);
-
+        let newLat = this.Leaflet.map.getCenter().lat
+        let newLng = this.Leaflet.map.getCenter().lng
         colyClient.room.send('move', {
             player_id: colyClient.options.id,
             id: player.id,
@@ -91,6 +92,9 @@ class HelperManager {
                 long: this.Leaflet.map.getCenter().lng
             }
         });
+        
+        player.position.lat = newLat;
+        player.position.long = newLng;
 
         this.Leaflet.setDetectionOnObject()
 

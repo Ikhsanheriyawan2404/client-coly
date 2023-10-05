@@ -1,11 +1,11 @@
 class MapLeaflet {
     constructor() {
         this.optionMaps = {
-            dragging: false,
-            zoomControl: false,
-            scrollWheelZoom: false,
-            doubleClickZoom: false,
-            touchZoom: false,
+            // dragging: false,
+            // zoomControl: false,
+            // scrollWheelZoom: false,
+            // doubleClickZoom: false,
+            // touchZoom: false,
         }
         this.trackplayback = null;
         this.allObjectMap = [];
@@ -157,10 +157,10 @@ class MapLeaflet {
     getObjectInScreen(objects) {
         let rectangle = L.rectangle(this.map.getBounds());
         let data = [];
-
+        
         for (const key of objects) {
             let keyLatLng = null;
-            if (key.properties.type == "polyline") {
+            if (key.properties.type == "polygon") {
                 keyLatLng = {
                     lat: key.properties.poly[0][0],
                     lng: key.properties.poly[0][1],
@@ -168,40 +168,80 @@ class MapLeaflet {
             } else {
                 keyLatLng = {
                     lat: key.properties.lat,
-                    lng: key.properties.lng,
+                    lng: key.properties.long,
                 };
             }
-                let point  = turf.point([keyLatLng.lng, keyLatLng.lat]);
-                var poly   = rectangle.toGeoJSON();
-                var inside = turf.inside(point, poly);
-                if (inside) {
-                    data.push(key)
-                }
+
+            let point  = turf.point([keyLatLng.lng, keyLatLng.lat]);
+            var poly   = rectangle.toGeoJSON();
+            var inside = turf.inside(point, poly);
+            if (inside) {
+                data.push(key)
+            }
         }
         return data;
     }
 
     setDetectionOnObject() {
         let allObjInScreen = this.getObjectInScreen(this.allObjectMap);
+        const player = Player.getPlayer(localStorage.getItem('player_id'));
 
-        console.log(allObjInScreen);
         // set interval to detect player
         if (allObjInScreen) {
-            const interval_ = window.setInterval(() => {
+            // const interval_ = window.setInterval(() => {
                 for (const object of allObjInScreen) {
-                    // let intersection = this.checkIntersectCircle(this.marker, object);
-                    // if (intersection) {
-                        
-                    // }
-                    object.interval = interval_;
+                    let intersect = false;
+                    if (object.properties.type == "polygon") {
+                        intersect = this.isPointInPolygon(player.position, object.properties.poly);
+                    } else {
+                        intersect = this.isPointInCircle(player.position, object.properties);
+                    }
+                    console.log(intersect)
+                    // object.interval = interval_;
                 }
-            }, 100);
+            // }, 100);
             
-            // turn off interval when player is out of screen
-            window.clearInterval(interval_);
-            object.interval = null;
+            // window.clearInterval(interval_);
+            // object.interval = null;
         }
     }
+
+    // Fungsi untuk menghitung jarak antara dua titik
+    calculateDistance(point1, point2) {
+        const dx = point1.lat - point2.lat;
+        const dy = point1.long - point2.long;
+        return Math.sqrt(dx * dx + dy * dy);
+    }
+    
+    // Fungsi untuk memeriksa apakah titik berada dalam circle
+    isPointInCircle(point, circle) {
+        const distance = this.calculateDistance(point, circle);
+        return distance <= circle.radius;
+    }
+    
+    // Fungsi untuk memeriksa apakah titik berada dalam polygon
+    isPointInPolygon(point, polygon) {
+        const x = point.lat;
+        const y = point.long;
+    
+        let inside = false;
+        for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+            const xi = polygon[i].x;
+            const yi = polygon[i].y;
+            const xj = polygon[j].x;
+            const yj = polygon[j].y;
+        
+            const intersect =
+                yi > y !== yj > y &&
+                x < ((xj - xi) * (y - yi)) / (yj - yi) + xi;
+            if (intersect) {
+                inside = !inside;
+            }
+        }
+    
+        return inside;
+    }
+    
 }
 
 const Leaflet = new MapLeaflet()
