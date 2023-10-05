@@ -68,6 +68,7 @@ class ColyClient {
         
         state.ObjectMap.$items.forEach((object, key) => {
           Leaflet.plotObject(object);
+          // Leaflet.allObjectMap.push(object);
         });
 
         state.BotEnemy.$items.forEach((bot, key) => {

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LOGIN | Treasure Game Hunter</title>
+</head>
+<body>
+    <h1>Login</h1>
+    <form action="" method="post">
+        <label for="email">Email</label>
+        <input type="text" name="email" id="email" required>
+        <br>
+        <label for="password">Password</label>
+        <input type="password" name="password" id="password" required>
+        <br>
+        <button type="submit" id="login">LOGIN</button>
+    </form>
+</body>
+
+<script>
+    const login = document.getElementById('login');
+    login.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+
+        const response = await fetch('http://localhost:3019/api/auth/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email, password })
+        }).catch(err => console.log(err));
+
+        const data = await response.json();
+        console.log(data);
+        if (data.meta.code == 200) {
+            localStorage.setItem('user', JSON.stringify(data.data));
+            localStorage.setItem('refreshToken', data.data.tokens.refresh.token);
+            localStorage.setItem('accessToken', data.data.tokens.access.token);
+            alert('Login Success');
+            window.location.href = 'index.html';
+        } else {
+            alert('Login Failed');
+        }
+    });
+</script>
+</html>

@@ -1,18 +1,73 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Treasure Game Hunter</title>
 </head>
 <body>
-    <!-- Form input enter your name -->
-    <form action="game.html" method="GET">
-        <label for="name">Masukan nama anda!</label>
-        <input type="text" id="name" name="name" required><br><br>
-        <input type="submit" value="Mainkan Game">
-    </form>
+    <h1>Welcome To Treasure Hunter Game Multiplayer</h1>
+    
+    <div id="hasLogin">
+        <p id="username"></p>
+        <a href="#" id="matchmaking">MATCHMAKING</a>
+    </div>
+    
+    <a href="login.html" id="btnLogin">LOGIN</a>
+    <br />
+    <a href="register.html" id="btnRegist">REGISTER</a>
+    
+    <script>
+        
 
+        async function fetchData() {
+            let user;
+            let userId;
+
+            if (localStorage.getItem("user")) {
+                user = JSON.parse(localStorage.getItem("user"));
+                userId = user.user.id;
+            } else {
+                user = null;
+                userId = null;
+            }
+            
+            if (!user) return;
+
+            const response = await fetch(`http://localhost:3019/api/users/${userId}`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${localStorage.getItem("accessToken")}`,
+                },
+            }).catch((err) => console.log(err));
+            
+            const data = await response.json();
+            const btnLogin = document.getElementById("btnLogin");
+            const btnRegist = document.getElementById("btnRegist");
+            const hasLogin = document.getElementById("hasLogin");
+            const username = document.getElementById("username");
+            
+            if (data.meta.code == 200) {
+                btnLogin.style.display = "none";
+                btnRegist.style.display = "none";
+                hasLogin.style.display = "block";
+                username.innerHTML = user.user.name;
+            } else if (data.meta.code == 401 || data.meta.code == 404) {
+                btnLogin.style.display = "block";
+                btnRegist.style.display = "block";
+                hasLogin.style.display = "none";
+            }
+        }
+
+        fetchData();
+
+        const matchmaking = document.getElementById("matchmaking");
+        matchmaking.addEventListener("click", () => {
+            const user = JSON.parse(localStorage.getItem("user"));
+            window.location.href = `game.html?name=${user.user.name}`;
+        });
+    </script>
 </body>
 </html>
