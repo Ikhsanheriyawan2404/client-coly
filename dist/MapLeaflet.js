@@ -1,11 +1,11 @@
 class MapLeaflet {
     constructor() {
         this.optionMaps = {
-            dragging: false,
-            zoomControl: false,
-            scrollWheelZoom: false,
-            doubleClickZoom: false,
-            touchZoom: false,
+            // dragging: false,
+            // zoomControl: false,
+            // scrollWheelZoom: false,
+            // doubleClickZoom: false,
+            // touchZoom: false,
         }
         this.trackplayback = null;
         this.allObjectMap = [];
@@ -129,16 +129,16 @@ class MapLeaflet {
                 speed: 20,
                 maxSpeed: 65
             },
-            trackLineOptions: {
-                // whether draw track line
-                isDraw: true,
-                stroke: true,
-                color: '#1C54E2',
-                weight: 2,
-                fill: false,
-                fillColor: '#000',
-                opacity: 0.3
-            },
+            // trackLineOptions: {
+            //     // whether draw track line
+            //     isDraw: true,
+            //     stroke: true,
+            //     color: '#1C54E2',
+            //     weight: 2,
+            //     fill: false,
+            //     fillColor: '#000',
+            //     opacity: 0.3
+            // },
         });
 
         trackplayback.start();

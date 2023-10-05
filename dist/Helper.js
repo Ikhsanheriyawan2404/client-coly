@@ -59,25 +59,30 @@ class HelperManager {
     moveMap(direction) {
         const player = Player.getPlayer(localStorage.getItem('player_id'));
         // console.log(player)
-        var step = 0.005; // Adjust the step size as needed
-        var currentCenter = this.Leaflet.map.getCenter();
+        const stepSize = 0.005; // Adjust the step size as needed
+        const currentCenter = this.Leaflet.map.getCenter();
+        let newCenter;
 
         switch (direction) {
             case 'up':
-                this.Leaflet.map.panTo([currentCenter.lat + (step / this.Leaflet.map.getZoom()), currentCenter.lng]);
+                newCenter = [currentCenter.lat + (stepSize / this.Leaflet.map.getZoom()), currentCenter.lng];
                 break;
             case 'down':
-                this.Leaflet.map.panTo([currentCenter.lat - (step / this.Leaflet.map.getZoom()), currentCenter.lng]);
+                newCenter = [currentCenter.lat - (stepSize / this.Leaflet.map.getZoom()), currentCenter.lng];
                 break;
             case 'left':
-                this.Leaflet.map.panTo([currentCenter.lat, currentCenter.lng - (step / this.Leaflet.map.getZoom())]);
+                newCenter = [currentCenter.lat, currentCenter.lng - (stepSize / this.Leaflet.map.getZoom())];
                 break;
             case 'right':
-                this.Leaflet.map.panTo([currentCenter.lat, currentCenter.lng + (step / this.Leaflet.map.getZoom())]);
+                newCenter = [currentCenter.lat, currentCenter.lng + (stepSize / this.Leaflet.map.getZoom())];
                 break;
             default:
-                break;
+                // Handle invalid direction
+                return;
         }
+
+        this.Leaflet.map.panTo(newCenter);
+
         colyClient.room.send('move', {
             player_id: colyClient.options.id,
             id: player.id,
@@ -86,7 +91,7 @@ class HelperManager {
                 long: this.Leaflet.map.getCenter().lng
             }
         });
-        this.Leaflet.marker.setLatLng(this.Leaflet.map.getCenter());
+        this.Leaflet.marker.setLatLng(newCenter);
     }
 
     polyToGeoJSON(polyData) {

@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "colyseus.js": "^0.15.9",
+    "dotenv": "^16.3.1",
     "jquery": "^3.7.0",
     "leaflet": "^1.7.1",
     "leaflet-plugin-trackplayback": "^1.0.5",

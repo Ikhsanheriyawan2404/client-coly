@@ -4,10 +4,10 @@ class EntityPlayer {
     }
   
     addPlayer(objects) {
-        const geoJSON = Helper.getRandomPositionByPolygon(Boundery.JakartaBounds);
-        const coordinates = geoJSON.geometry.coordinates[0];
-        const latitudes = coordinates.map(coord => coord[1]);
-        const longitudes = coordinates.map(coord => coord[0]);
+        // const geoJSON = Helper.getRandomPositionByPolygon(Boundery.JakartaBounds);
+        // const coordinates = geoJSON.geometry.coordinates[0];
+        // const latitudes = coordinates.map(coord => coord[1]);
+        // const longitudes = coordinates.map(coord => coord[0]);
 
         const player = {
           "id": objects.id,
