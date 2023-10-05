@@ -91,6 +91,9 @@ class HelperManager {
                 long: this.Leaflet.map.getCenter().lng
             }
         });
+
+        this.Leaflet.setDetectionOnObject()
+
         this.Leaflet.marker.setLatLng(newCenter);
     }
 

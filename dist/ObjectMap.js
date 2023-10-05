@@ -9,6 +9,10 @@ class ObjectMap {
         this.listDetect = [];
     }
 
+    detectPlayerMovement = () => {
+        
+    }
+
     // detectPlayerMovement = (objectId = null) => {
     //     let object = this;
     //     let interval_ = window.setInterval(() => {
