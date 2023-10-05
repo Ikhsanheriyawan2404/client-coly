@@ -1,11 +1,11 @@
 class MapLeaflet {
     constructor() {
         this.optionMaps = {
-            // dragging: false,
-            // zoomControl: false,
-            // scrollWheelZoom: false,
-            // doubleClickZoom: false,
-            // touchZoom: false,
+            dragging: false,
+            zoomControl: false,
+            scrollWheelZoom: false,
+            doubleClickZoom: false,
+            touchZoom: false,
         }
         this.trackplayback = null;
         this.allObjectMap = [];
@@ -54,7 +54,7 @@ class MapLeaflet {
     plotObject(object) {
         let properties = JSON.parse(object.properties);
         let objectMap = null;
-        if (object.type == "explosion" || object.type == "item") {
+        if (object.type == "explosion" || object.type == "item" || object.type == "treasure") {
             const center = [properties.lat, properties.long];
             objectMap = L.circle(center, {
                 color: object.type == "explosion" ? 'red' : 'green',
@@ -145,13 +145,62 @@ class MapLeaflet {
         // trackplayback.showTrackLine();
 
        
-        // trackplayback.rePlaying();
+        trackplayback.rePlaying();
         const trackplaybackControl = L.trackplaybackcontrol(trackplayback);
         trackplaybackControl.addTo(this.map);
         // hide control on maps
         // trackplaybackControl.hide();
 
         this.trackplayback = trackplayback;
+    }
+
+    getObjectInScreen(objects) {
+        let rectangle = L.rectangle(this.map.getBounds());
+        let data = [];
+
+        for (const key of objects) {
+            let keyLatLng = null;
+            if (key.properties.type == "polyline") {
+                keyLatLng = {
+                    lat: key.properties.poly[0][0],
+                    lng: key.properties.poly[0][1],
+                };
+            } else {
+                keyLatLng = {
+                    lat: key.properties.lat,
+                    lng: key.properties.lng,
+                };
+            }
+                let point  = turf.point([keyLatLng.lng, keyLatLng.lat]);
+                var poly   = rectangle.toGeoJSON();
+                var inside = turf.inside(point, poly);
+                if (inside) {
+                    data.push(key)
+                }
+        }
+        return data;
+    }
+
+    setDetectionOnObject() {
+        let allObjInScreen = this.getObjectInScreen(this.allObjectMap);
+
+        console.log(allObjInScreen);
+        // set interval to detect player
+        if (allObjInScreen) {
+            const interval_ = window.setInterval(() => {
+                for (const object of allObjInScreen) {
+                    // let intersection = this.checkIntersectCircle(this.marker, object);
+                    // if (intersection) {
+                        
+                    // }
+                    object.interval = interval_;
+                }
+            }, 100);
+            
+            // turn off interval when player is out of screen
+            window.clearInterval(interval_);
+            object.interval = null;
+        }
     }
 }
 
