@@ -145,7 +145,7 @@ class MapLeaflet {
         // trackplayback.showTrackLine();
 
        
-        // trackplayback.rePlaying();
+        trackplayback.rePlaying();
         const trackplaybackControl = L.trackplaybackcontrol(trackplayback);
         trackplaybackControl.addTo(this.map);
         // hide control on maps

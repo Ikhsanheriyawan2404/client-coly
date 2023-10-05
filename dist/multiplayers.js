@@ -33,14 +33,18 @@ class ColyClient {
   }
 
   async connectToServer() {
-    await this.client.joinOrCreate("my_room", this.options).then(room => {
-      colyClient.room = room;
-      localStorage.setItem("player_id", room.sessionId)
-      this.addListeners();
-      console.log("JOIN SUCCESS", room);
-    }).catch(e => {
-      console.log("JOIN ERROR", e);
-    });
+    if (await auth.check()) {
+      await this.client.joinOrCreate("my_room", this.options).then(room => {
+        colyClient.room = room;
+        localStorage.setItem("player_id", room.sessionId)
+        this.addListeners();
+        console.log("JOIN SUCCESS", room);
+      }).catch(e => {
+        console.log("JOIN ERROR", e);
+      });
+    } else {
+      alert("Login dulu guys");
+    }
   }
 
 	// async connect(roomName, options) {
