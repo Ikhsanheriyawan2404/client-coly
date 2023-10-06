@@ -3,10 +3,20 @@ class ObjectMap {
         this.id = objects.id;
         this.is_active = objects.is_active;
         this.type = objects.type;
+        this.layer = objects.layer;
         this.properties = JSON.parse(objects.properties);
 
         this.interval = null;
         this.listDetect = [];
+    }
+
+    showObject = () => {
+        // if (this.is_active == false) return;
+        this.layer.addTo(Leaflet.map);
+    }
+
+    hideObject = () => {
+        this.layer.removeFrom(Leaflet.map);
     }
 
     detectPlayerMovement = () => {

@@ -10,6 +10,7 @@ class MapLeaflet {
         this.trackplayback = null;
         this.allObjectMap = [];
         this.botEnemy = [];
+        this.dataObjectInScreen = [];
 
         // this.optionMaps = {}
 
@@ -83,9 +84,15 @@ class MapLeaflet {
             }
         }
 
+        object.layer = objectMap;
         let newObject = new ObjectMap(object);
+        console.log(newObject);
+        // distance = 0.0020611672089137813  
+        // radius = 95
         this.allObjectMap.push(newObject);
         objectMap.addTo(this.map).bindPopup(object.type);
+        newObject.is_active = false;
+        newObject.layer.removeFrom(this.map);
     }
 
     plotEnemyBot(object) {
@@ -97,8 +104,7 @@ class MapLeaflet {
        
     }
 
-    setPergerakanBot()
-    {
+    setPergerakanBot() {
         const data = [];
         for (const bot of this.botEnemy) {
             const newObject = bot;
@@ -177,6 +183,14 @@ class MapLeaflet {
             var inside = turf.inside(point, poly);
             if (inside) {
                 data.push(key)
+                this.dataObjectInScreen.push(key.id);
+                key.is_active = true;
+                key.showObject();
+            } else {
+                this.dataObjectInScreen = this.dataObjectInScreen.filter((value) => {
+                    return value == key.id;
+                })
+                key.hideObject();
             }
         }
         return data;
@@ -193,11 +207,25 @@ class MapLeaflet {
                     let intersect = false;
                     if (object.properties.type == "polygon") {
                         intersect = this.isPointInPolygon(player.position, object.properties.poly);
+                        console.log({objPoly: intersect})
                     } else {
                         intersect = this.isPointInCircle(player.position, object.properties);
+                        console.log({objCircle: intersect})
                     }
-                    console.log(intersect)
-                    // object.interval = interval_;
+                    if (intersect) {
+                        object.hideObject();
+                        object.is_active = false;
+                        console.log({object});
+                        // delete object
+                        if (object.type == "treasure") {
+                            toastr.info("Kamu dapat point" + object.properties.point)
+                        } else if (object.type == "item") {
+                            toastr.info("Kamu dapat item" + object.properties?.health + " " + object.properties?.speed)
+                        }
+                        this.allObjectMap = this.allObjectMap.filter((value) => {
+                            return value.id != object.id;
+                        })
+                    }
                 }
             // }, 100);
             
@@ -208,19 +236,30 @@ class MapLeaflet {
 
     // Fungsi untuk menghitung jarak antara dua titik
     calculateDistance(point1, point2) {
-        const dx = point1.lat - point2.lat;
-        const dy = point1.long - point2.long;
-        return Math.sqrt(dx * dx + dy * dy);
-    }
+        const lat1InKm = point1.lat * 111.32;
+        const lat2InKm = point2.lat * 111.32;
+      
+        // Hitung jarak dalam kilometer
+        const dxInKm = lat1InKm - lat2InKm;
+        const dyInKm = (point1.long - point2.long) * 111.32;
+      
+        // Konversi kilometer ke meter (1 kilometer = 1000 meter)
+        const distanceInMeters = Math.sqrt(dxInKm * dxInKm + dyInKm * dyInKm) * 1000;
+      
+        return distanceInMeters;
+        // return Math.sqrt(dx * dx + dy * dy);
+    }   
     
     // Fungsi untuk memeriksa apakah titik berada dalam circle
     isPointInCircle(point, circle) {
         const distance = this.calculateDistance(point, circle);
+        let radius = circle.radius;
         return distance <= circle.radius;
     }
     
     // Fungsi untuk memeriksa apakah titik berada dalam polygon
     isPointInPolygon(point, polygon) {
+        console.log({polygon});
         const x = point.lat;
         const y = point.long;
     

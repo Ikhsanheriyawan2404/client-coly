@@ -60,6 +60,7 @@ class HelperManager {
         const player = Player.getPlayer(localStorage.getItem('player_id'));
         // console.log(player)
         const stepSize = 0.005; // Adjust the step size as needed
+        // const stepSize = 0.015; // Adjust the step size as needed
         const currentCenter = this.Leaflet.map.getCenter();
         let newCenter;
 
