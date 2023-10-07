@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ranking Users</title>
+</head>
+<body>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Rank</th>
+                <th>Name</th>
+                <th>Points</th>
+            </tr>
+        </thead>
+        <tbody id="listRanking">
+            
+        </tbody>
+    </table>
+    <script>
+        // fetch on localhost:3019/api/users/ranks
+        // get data from response
+        // show data on table
+        async function fetchData() {
+            const response = await fetch("http://localhost:3019/api/users/ranks", {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            }).catch((err) => console.log(err));
+            
+            const data = await response.json();
+            console.log(data);
+            if (data.meta.code == 200) {
+                const listRanking = document.getElementById("listRanking");
+                let rank = 1;
+                data.data.forEach((user) => {
+                    const tr = document.createElement("tr");
+                    const tdRank = document.createElement("td");
+                    const tdName = document.createElement("td");
+                    const tdScore = document.createElement("td");
+                    tdRank.innerHTML = rank;
+                    tdName.innerHTML = user.name;
+                    tdScore.innerHTML = user.points;
+                    tr.appendChild(tdRank);
+                    tr.appendChild(tdName);
+                    tr.appendChild(tdScore);
+                    listRanking.appendChild(tr);
+                    rank++;
+                });
+            }
+        }
+
+            fetchData();
+    </script>
+</body>
+</html>

@@ -1,11 +1,11 @@
 class MapLeaflet {
     constructor() {
         this.optionMaps = {
-            // dragging: false,
-            // zoomControl: false,
-            // scrollWheelZoom: false,
-            // doubleClickZoom: false,
-            // touchZoom: false,
+            dragging: false,
+            zoomControl: false,
+            scrollWheelZoom: false,
+            doubleClickZoom: false,
+            touchZoom: false,
         }
         this.trackplayback = null;
         this.allObjectMap = [];
@@ -233,6 +233,7 @@ class MapLeaflet {
                                 player_id: player.id,
                                 points: object.properties.point,
                             }
+                            document.getElementById('pointsBar').textContent = player.points + object.properties.point;
                             toastr.info("Kamu dapat TREASURE : " + object.properties.point)
                         } else if (object.type == "speed") {
                             endpoint = "increaseSpeed";
@@ -240,6 +241,7 @@ class MapLeaflet {
                                 player_id: player.id,
                                 speed: object.properties.speed,
                             }
+                            document.getElementById('speedBar').textContent = player.speed + object.properties.speed;
                             toastr.info("Kamu lebih cepat : " + object.properties.speed)
                         } else if (object.type == "item") {
                             endpoint = "increaseHealth";
@@ -247,6 +249,7 @@ class MapLeaflet {
                                 player_id: player.id,
                                 health: object.properties.health,
                             }
+                            document.getElementById('healthBar').textContent = player.health + object.properties.health;
                             toastr.info(`Kamu dapat item HEALTH:${object.properties?.health}`)
                         } else if (object.type == "explosion") {
                             endpoint = "decreaseHealth";
@@ -254,6 +257,7 @@ class MapLeaflet {
                                 player_id: player.id,
                                 damage: object.properties.damage,
                             }
+                            document.getElementById('healthBar').textContent = player.health - object.properties.damage;
                             toastr.warning("Kamu terkena ledakan :" + object.properties?.damage)
                         } else if (object.type == "weather") {
                             endpoint = "decreaseHealth";
@@ -261,11 +265,13 @@ class MapLeaflet {
                                 player_id: player.id,
                                 damage: object.properties.damage,
                             }
+                            document.getElementById('healthBar').textContent = player.health - object.properties.damage;
                             toastr.warning("Kamu nabrak tembok :" + object.properties?.damage)
                         }
+                        
 
                         console.log(endpoint, data);
-
+                        // send set update state player
                         colyClient.room.send(endpoint, data);
 
                         colyClient.room.send("deleteObject", {

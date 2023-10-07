@@ -11,6 +11,7 @@ class EntityPlayer {
 
         const player = {
           "id": objects.id,
+          "idReal": objects.idReal,
           "name": objects.name,
           "health": objects.health,
           "speed": objects.speed,

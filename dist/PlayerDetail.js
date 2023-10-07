@@ -2,6 +2,7 @@ class PlayerDetail {
 
     constructor(objects) {
         this.id = objects.id;
+        this.idReal = objects.idReal;
         this.name = objects.name;
         this.points = objects.points;
         this.health = objects.health;

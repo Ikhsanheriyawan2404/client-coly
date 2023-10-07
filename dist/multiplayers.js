@@ -105,6 +105,8 @@ class ColyClient {
           Leaflet.center = center;
           
           dataPlayer.marker = L.marker(center, {icon: Leaflet.avatarIcon});
+          
+          dataPlayer.idReal = 100;
           Player.addPlayer(dataPlayer);
         })
 
@@ -126,7 +128,7 @@ class ColyClient {
       });
 
       this.room.onMessage("onJoin", (message) => {
-        toastr.success(`${message.message} ${message.id}`);
+        toastr.success(`${message.message} ${message.player.name}`);
       });
 
       this.room.onMessage("deleteObject", (message) => {
@@ -140,18 +142,16 @@ class ColyClient {
 
       this.room.onMessage("increaseHealth", (message) => {
         let player = Player.getPlayer(message.player_id);
-        document.getElementById('healthBar').textContent = message.health;
         player.setHealth(message.health);
       });
 
       this.room.onMessage("decreaseHealth", (message) => {
         let player = Player.getPlayer(message.player_id);
-        document.getElementById('healthBar').textContent = message.health;
         player.setHealth(message.health);
         if (message.health <= 0) {
           if (message.player_id == localStorage.getItem('player_id')) {
-            this.room.leave();
             alert(`You Died!`);
+            this.room.leave();
             window.location.href = "index.html";
           }
         }
@@ -159,21 +159,34 @@ class ColyClient {
 
       this.room.onMessage("increasePoint", (message) => {
         let player = Player.getPlayer(message.player_id);
-        document.getElementById('pointsBar').textContent = message.points;
         player.setPoints(message.points);
-        if (message.points >= 200) {
+        const user = JSON.parse(localStorage.getItem('user'));
+        console.log(user.user.id);
+        if (message.points >= 100) {
+          fetch(`http://localhost:3019/api/end-game/${user.user.id}`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              "Authorization": `Bearer ${localStorage.getItem("accessToken")}`,
+            },
+            body: JSON.stringify({
+              points: message.points,
+              room: "fsdf"
+            })
+          }).catch((err) => {
+            console.log(err);
+          });
+          alert(`${player.name} Winning the game!`);
           this.room.send("endGame", {
             player_id: message.player_id,
             theWinner: player.name
           })
-          alert(`${player.name} Winning the game!`);
-          window.location.href = "index.html";
+          // window.location.href = "index.html";
         }
       });
 
       this.room.onMessage("increaseSpeed", (message) => {
         let player = Player.getPlayer(message.player_id);
-        document.getElementById('speedBar').textContent = message.speed;
         player.setSpeed(message.speed);
       });
       
@@ -183,7 +196,7 @@ class ColyClient {
       });
 
       this.room.onMessage("onLeave", (message) => {
-        toastr.error(`${message} meninggalkan permainan!`);
+        toastr.error(`${message.player.name} meninggalkan permainan!`);
         Player.removePlayer(message);
       });
 
