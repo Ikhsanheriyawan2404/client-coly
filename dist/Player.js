@@ -13,8 +13,8 @@ class EntityPlayer {
           "id": objects.id,
           "name": objects.name,
           "health": objects.health,
-          "armor": objects.health,
-          "speed": objects.health,
+          "speed": objects.speed,
+          "points": objects.points,
           "position": {
             "lat": objects.position.lat,
             "long": objects.position.long

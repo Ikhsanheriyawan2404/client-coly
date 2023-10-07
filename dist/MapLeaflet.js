@@ -55,12 +55,28 @@ class MapLeaflet {
     plotObject(object) {
         let properties = JSON.parse(object.properties);
         let objectMap = null;
-        if (object.type == "explosion" || object.type == "item" || object.type == "treasure") {
+        if (object.type == "explosion" || object.type == "item" || object.type == "treasure" || object.type == "speed") {
             const center = [properties.lat, properties.long];
+            let color = "";
+            switch (object.type) {
+                case "explosion":
+                    color = "red";
+                    break;
+                case "item":
+                    color = "green";
+                    break;
+                case "treasure":
+                    color = "yellow";
+                    break;
+                case "speed":
+                    color = "blue";
+                    break;
+            }
+
             objectMap = L.circle(center, {
-                color: object.type == "explosion" ? 'red' : 'green',
+                color: color,
                 // fillColor: '#f03',
-                fillOpacity: 0.5,
+                fillOpacity: 0.3,
                 radius: properties.radius
             });
         } else if (object.type == "wall" || object.type == "weather") {
@@ -86,9 +102,6 @@ class MapLeaflet {
 
         object.layer = objectMap;
         let newObject = new ObjectMap(object);
-        console.log(newObject);
-        // distance = 0.0020611672089137813  
-        // radius = 95
         this.allObjectMap.push(newObject);
         objectMap.addTo(this.map).bindPopup(object.type);
         newObject.is_active = false;
@@ -207,24 +220,61 @@ class MapLeaflet {
                     let intersect = false;
                     if (object.properties.type == "polygon") {
                         intersect = this.isPointInPolygon(player.position, object.properties.poly);
-                        console.log({objPoly: intersect})
                     } else {
                         intersect = this.isPointInCircle(player.position, object.properties);
-                        console.log({objCircle: intersect})
                     }
                     if (intersect) {
-                        object.hideObject();
-                        object.is_active = false;
-                        console.log({object});
+                        let data = {};
+                        let endpoint = "";
                         // delete object
                         if (object.type == "treasure") {
-                            toastr.info("Kamu dapat point" + object.properties.point)
+                            endpoint = "increasePoint";
+                            data = {
+                                player_id: player.id,
+                                points: object.properties.point,
+                            }
+                            toastr.info("Kamu dapat TREASURE : " + object.properties.point)
+                        } else if (object.type == "speed") {
+                            endpoint = "increaseSpeed";
+                            data = {
+                                player_id: player.id,
+                                speed: object.properties.speed,
+                            }
+                            toastr.info("Kamu lebih cepat : " + object.properties.speed)
                         } else if (object.type == "item") {
-                            toastr.info("Kamu dapat item" + object.properties?.health + " " + object.properties?.speed)
+                            endpoint = "increaseHealth";
+                            data = {
+                                player_id: player.id,
+                                health: object.properties.health,
+                            }
+                            toastr.info(`Kamu dapat item HEALTH:${object.properties?.health}`)
+                        } else if (object.type == "explosion") {
+                            endpoint = "decreaseHealth";
+                            data = {
+                                player_id: player.id,
+                                damage: object.properties.damage,
+                            }
+                            toastr.warning("Kamu terkena ledakan :" + object.properties?.damage)
+                        } else if (object.type == "weather") {
+                            endpoint = "decreaseHealth";
+                            data = {
+                                player_id: player.id,
+                                damage: object.properties.damage,
+                            }
+                            toastr.warning("Kamu nabrak tembok :" + object.properties?.damage)
                         }
-                        this.allObjectMap = this.allObjectMap.filter((value) => {
-                            return value.id != object.id;
-                        })
+
+                        console.log(endpoint, data);
+
+                        colyClient.room.send(endpoint, data);
+
+                        colyClient.room.send("deleteObject", {
+                            id: object.id,
+                        });
+                        
+                        // this.allObjectMap = this.allObjectMap.filter((value) => {
+                        //     return value.id != object.id;
+                        // })
                     }
                 }
             // }, 100);
@@ -253,13 +303,11 @@ class MapLeaflet {
     // Fungsi untuk memeriksa apakah titik berada dalam circle
     isPointInCircle(point, circle) {
         const distance = this.calculateDistance(point, circle);
-        let radius = circle.radius;
         return distance <= circle.radius;
     }
     
     // Fungsi untuk memeriksa apakah titik berada dalam polygon
     isPointInPolygon(point, polygon) {
-        console.log({polygon});
         const x = point.lat;
         const y = point.long;
     

@@ -25,6 +25,23 @@ class PlayerDetail {
     //     Leaflet.marker = L.marker(center, {icon: Leaflet.avatarIcon}).addTo(Leaflet.map);
     // }
 
+    setHealth(health) {
+        this.health = health;
+    }
+
+    setPoints(points) {
+        this.points = points;
+    }
+
+    setSpeed(speed) {
+        this.speed = speed;
+    }
+
+    getStepSize() {
+        let tempResult = this.speed / 20;
+        return tempResult / 1000;
+    }
+
     moveIcon = (lat, long) => {
         const center = [
             lat,

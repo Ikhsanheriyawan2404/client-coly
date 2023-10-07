@@ -39,11 +39,14 @@ class ColyClient {
         localStorage.setItem("player_id", room.sessionId)
         this.addListeners();
         console.log("JOIN SUCCESS", room);
+
+
       }).catch(e => {
         console.log("JOIN ERROR", e);
       });
     } else {
       alert("Login dulu guys");
+      window.location.href = "index.html";
     }
   }
 
@@ -68,7 +71,6 @@ class ColyClient {
         state.Message.$items.forEach((messages, key) => {
           Helper.displayMessage(messages);
         });
-
         
         state.ObjectMap.$items.forEach((object, key) => {
           Leaflet.plotObject(object);
@@ -127,6 +129,53 @@ class ColyClient {
         toastr.success(`${message.message} ${message.id}`);
       });
 
+      this.room.onMessage("deleteObject", (message) => {
+        let object = Leaflet.allObjectMap.find((obj) => obj.id == message.id);
+        object.hideObject();
+        object.is_active = false;
+        Leaflet.allObjectMap = Leaflet.allObjectMap.filter((value) => {
+            return value.id != message.id;
+        })
+      });
+
+      this.room.onMessage("increaseHealth", (message) => {
+        let player = Player.getPlayer(message.player_id);
+        document.getElementById('healthBar').textContent = message.health;
+        player.setHealth(message.health);
+      });
+
+      this.room.onMessage("decreaseHealth", (message) => {
+        let player = Player.getPlayer(message.player_id);
+        document.getElementById('healthBar').textContent = message.health;
+        player.setHealth(message.health);
+        if (message.health <= 0) {
+          if (message.player_id == localStorage.getItem('player_id')) {
+            this.room.leave();
+            alert(`You Died!`);
+            window.location.href = "index.html";
+          }
+        }
+      });
+
+      this.room.onMessage("increasePoint", (message) => {
+        let player = Player.getPlayer(message.player_id);
+        document.getElementById('pointsBar').textContent = message.points;
+        player.setPoints(message.points);
+        if (message.points >= 200) {
+          this.room.send("endGame", {
+            player_id: message.player_id,
+            theWinner: player.name
+          })
+          alert(`${player.name} Winning the game!`);
+          window.location.href = "index.html";
+        }
+      });
+
+      this.room.onMessage("increaseSpeed", (message) => {
+        let player = Player.getPlayer(message.player_id);
+        document.getElementById('speedBar').textContent = message.speed;
+        player.setSpeed(message.speed);
+      });
       
       this.room.onMessage("move", (message) => {
         let player = Player.getPlayer(message.id)

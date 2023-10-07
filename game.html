@@ -25,11 +25,13 @@
             z-index: 0;
         }
 
-        .fafdaf {
-            position: absolute;
-            bottom: 20px;
-            left: 20px; /* Mengatur jarak dari kiri */
-            z-index: 1000;
+        #chat.minimized {
+            height: 80px; /* Atur tinggi chat ketika diperkecil */
+            overflow: hidden;
+        }
+
+        #chat.expanded {
+            height: auto; /* Atur kembali tinggi chat ketika diperluas */
         }
 
         #chat {
@@ -66,10 +68,14 @@
     <div id="map"></div>
 
     <!-- Chat Modal -->
-    <div id="chat">
+    <div id="chat" class="expanded">
+        <button>minimize</button>
+        <div>Health: <b id="healthBar">100</b></div>
+        <div>Speed: <b id="speedBar">100</b></div>
+        <div>Points: <b id="pointsBar">0</b></div>
         <div id="chat-messages"></div>
         <input type="text" id="chat-input" placeholder="Ketik pesan anda disini..." />
-        <button onclick="Helper.sendMessage()">Send</button>
+        <!-- <button onclick="Helper.sendMessage()">Send</button> -->
 
     <!-- Analog Buttons -->
     <div class="analog-buttons">
@@ -104,6 +110,34 @@
     <script src="dist/multiplayers.js"></script>
     
     <script>
+
+
+    const chatElement = document.getElementById("chat");
+    const minimizeButton = document.querySelector("#chat button");
+    
+    minimizeButton.addEventListener("click", function () {
+        if (chatElement.classList.contains("expanded")) {
+            chatElement.classList.remove("expanded");
+            chatElement.classList.add("minimized");
+            minimizeButton.textContent = "Maximize";
+        } else {
+            chatElement.classList.remove("minimized");
+            chatElement.classList.add("expanded");
+            minimizeButton.textContent = "Minimize";
+        }
+    });
+
+    const inputElement = document.getElementById("chat-input");
+    inputElement.addEventListener("keypress", function (event) {
+        // Mengecek apakah tombol yang ditekan adalah "Enter" (kode 13)
+        if (event.keyCode === 13) {
+            // Mencegah pengiriman formulir (halaman tidak akan refresh)
+            event.preventDefault();
+
+            // Memanggil fungsi sendMessage() saat "Enter" ditekan
+            Helper.sendMessage();
+        }
+    });
 
     document.addEventListener("keydown", function(event) {
         var key = event.key.toLowerCase();
